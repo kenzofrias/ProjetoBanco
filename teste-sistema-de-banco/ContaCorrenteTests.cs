@@ -6,13 +6,13 @@ using System.Text;
 
 namespace teste_sistema_de_banco;
 
-public class UnitTest1
+public class ContaCorrenteTests
 {
     private ContaCorrente _contaCorrenteSaldo20 = new ContaCorrente("54321", "Carlos D E Lima", 20m, 100m);
     private ContaCorrente _contaCorrente = new ContaCorrente("12345", "João C O Silva", 345.22m, 500m);
     private ContaCorrente _contaCorrenteDestino = new ContaCorrente("67890", "Maria A B Souza", 1000m, 300m);
 
-    public UnitTest1()
+    public ContaCorrenteTests()
     {
         Console.OutputEncoding = Encoding.UTF8;
     }

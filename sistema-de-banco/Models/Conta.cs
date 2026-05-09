@@ -11,7 +11,7 @@ namespace sistema_de_banco.Models
         protected string Numero { get; set; }
         protected string Titular { get; set; }
         protected decimal Saldo { get; set; }
-        protected bool Ativa { get; set; } = false;
+        public bool Ativa { get; set; } = false;
         protected Stack<string> Historico;
 
         public Conta(string numero, string titular, decimal saldo)
@@ -28,7 +28,7 @@ namespace sistema_de_banco.Models
             if (Ativa && valor > 0)
             {
                 Saldo += valor;
-                Historico.Push($"Depósito: +{valor:C} | Saldo: {Saldo:C}");
+                Historico.Push($"Depósito: +{valor:C} | Saldo anterior: {Saldo - valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor <= 0)
             {
@@ -45,7 +45,7 @@ namespace sistema_de_banco.Models
             if (Ativa && valor > 0 && Saldo >= valor)
             {
                 Saldo -= valor;
-                Historico.Push($"Saque: -{valor:C} | Saldo: {Saldo:C}");
+                Historico.Push($"Saque: -{valor:C} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor)
             {
@@ -67,8 +67,8 @@ namespace sistema_de_banco.Models
             {
                 Saldo -= valor;
                 destino.Depositar(valor);
-                Historico.Push($"Transferência: -{valor:C} para {destino.Titular} | Saldo: {Saldo:C}");
-                destino.Historico.Push($"Transferência: +{valor:C} de {Titular} | Saldo: {destino.Saldo:C}");
+                Historico.Push($"Transferência: -{valor:C} para {destino.Titular} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
+                destino.Historico.Push($"Transferência: +{valor:C} de {Titular} | Saldo anterior: {destino.Saldo - valor:C} | Saldo atual: {destino.Saldo:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor)
             {
@@ -102,7 +102,7 @@ namespace sistema_de_banco.Models
             }
         }
 
-        public decimal ObterSaldo() => Saldo;
+        public decimal ObterSaldo() => Math.Round(Saldo, 2);
 
         public virtual void CalcularTarifaMensal() { }
         public virtual void AplicarRendimento() { }
