@@ -8,7 +8,9 @@ namespace teste_sistema_de_banco;
 
 public class UnitTest1
 {
+    private ContaCorrente _contaCorrenteSaldo20 = new ContaCorrente("54321", "Carlos D E Lima", 20m, 100m);
     private ContaCorrente _contaCorrente = new ContaCorrente("12345", "João C O Silva", 345.22m, 500m);
+    private ContaCorrente _contaCorrenteDestino = new ContaCorrente("67890", "Maria A B Souza", 1000m, 300m);
 
     public UnitTest1()
     {
@@ -24,6 +26,7 @@ public class UnitTest1
         _contaCorrente.Depositar(valorDeposito);
 
         Assert.Equal(845.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(1345.22m, _contaCorrente.ObterSaldoDisponivel());
     }
 
     [Fact]
@@ -34,6 +37,7 @@ public class UnitTest1
         _contaCorrente.Depositar(valorDeposito);
 
         Assert.Equal(1067.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(1567.22m, _contaCorrente.ObterSaldoDisponivel());
     }
 
     [Fact]
@@ -42,7 +46,7 @@ public class UnitTest1
         // Given
         decimal valorDeposito = -200m;
         // When
-        var ex = Assert.Throws<ValorNegativo>(
+        var ex = Assert.Throws<ValorInsuficienteException>(
         () => _contaCorrente.Depositar(valorDeposito));
 
         // Then
@@ -55,7 +59,7 @@ public class UnitTest1
         // Given
         decimal valorDeposito = 0m;
         // When
-        var ex = Assert.Throws<ValorNegativo>(
+        var ex = Assert.Throws<ValorInsuficienteException>(
         () => _contaCorrente.Depositar(valorDeposito));
 
         // Then
@@ -72,6 +76,7 @@ public class UnitTest1
 
         // Then
         Assert.Equal(1043.02m, _contaCorrente.ObterSaldo());
+        Assert.Equal(1543.02m, _contaCorrente.ObterSaldoDisponivel());
     }
 
     // Testes de saque
@@ -88,6 +93,7 @@ public class UnitTest1
 
         // Then
         Assert.Equal(140m, _contaCorrente.ObterSaldo());
+        Assert.Equal(640m, _contaCorrente.ObterSaldoDisponivel());
     }
 
     [Fact]
@@ -100,7 +106,7 @@ public class UnitTest1
         _contaCorrente.Sacar(valorSaque);
 
         // Then
-        Assert.Equal(-345.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(-154.78m, _contaCorrente.ObterSaldo());
         Assert.Equal(345.22m, _contaCorrente.ObterSaldoDisponivel());
     }
 
@@ -111,7 +117,7 @@ public class UnitTest1
         decimal valorSaque = 1000m;
 
         // When
-        var ex = Assert.Throws<SaldoInsuficiente>(
+        var ex = Assert.Throws<SaldoInsuficienteException>(
         () => _contaCorrente.Sacar(valorSaque));
 
         // Then
@@ -124,9 +130,9 @@ public class UnitTest1
         _contaCorrente.Sacar(100m);
         _contaCorrente.Sacar(55m);
         _contaCorrente.Sacar(359.22m);
-        _contaCorrente.ExibirExtrato();
 
-        Assert.Equal(-331m, _contaCorrente.ObterSaldo());
+        Assert.Equal(-169m, _contaCorrente.ObterSaldo());
+        Assert.Equal(331m, _contaCorrente.ObterSaldoDisponivel());
     }
 
     [Fact]
@@ -135,7 +141,7 @@ public class UnitTest1
         // Given
         decimal valorSaque = -200m;
         // When
-        var ex = Assert.Throws<ValorNegativo>(
+        var ex = Assert.Throws<ValorInsuficienteException>(
         () => _contaCorrente.Sacar(valorSaque));
 
         // Then
@@ -148,7 +154,7 @@ public class UnitTest1
         // Given
         decimal valorSaque = 0m;
         // When
-        var ex = Assert.Throws<ValorNegativo>(
+        var ex = Assert.Throws<ValorInsuficienteException>(
         () => _contaCorrente.Sacar(valorSaque));
 
         // Then
@@ -156,4 +162,116 @@ public class UnitTest1
     }
 
     // Testes de transferência
+    [Fact]
+    public void DeveEnviar0ReaisERetornarExcecao()
+    {
+        // Given
+        decimal valorTransferencia = 0m;
+
+        // When
+        var ex = Assert.Throws<ValorInsuficienteException>(
+            () => _contaCorrente.Transferir(_contaCorrenteDestino, valorTransferencia));
+
+        // Then
+        Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.", ex.Message);
+    }
+
+    [Fact]
+    public void DeveEnviar200ReaisParaContaDestinoERetornarSaldoCorreto()
+    {
+        // Given
+        decimal valorTransferencia = 200m;
+
+        // When
+        _contaCorrente.Transferir(_contaCorrenteDestino, valorTransferencia);
+
+        // Then
+        Assert.Equal(145.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(1200m, _contaCorrenteDestino.ObterSaldo());
+
+        Assert.Equal(645.22m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(1500m, _contaCorrenteDestino.ObterSaldoDisponivel());
+    }
+
+    [Fact]
+    public void DeveEnviar500ReaisComChequeParaContaDestinoERetornarSaldoCorreto()
+    {
+        // Given
+        decimal valorTransferencia = 500m;
+
+        // When
+        _contaCorrente.Transferir(_contaCorrenteDestino, valorTransferencia);
+
+        // Then
+        Assert.Equal(-345.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(1500m, _contaCorrenteDestino.ObterSaldo());
+
+        Assert.Equal(345.22m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(1800m, _contaCorrenteDestino.ObterSaldoDisponivel());
+    }
+
+    [Fact]
+    public void TentarEnviar1000ReaisERetornarExcecao()
+    {
+        // Given
+        decimal valorTransferencia = 1000m;
+
+        // When
+        var ex = Assert.Throws<SaldoInsuficienteException>(
+            () => _contaCorrente.Transferir(_contaCorrenteDestino, valorTransferencia));
+
+        // Then
+        Assert.Equal("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.", ex.Message);
+    }
+
+    // Teste de Tarifa Mensal
+    [Fact]
+    public void DeveCalcularTarifaMensalERetornarSaldoCorreto()
+    {
+        // Given
+
+        // When
+        _contaCorrente.CalcularTarifaMensal();
+
+        // Then
+        Assert.Equal(320.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(820.22m, _contaCorrente.ObterSaldoDisponivel());
+    }
+
+    [Fact]
+    public void DeveCalcularTarifaMensalComChequeEspecialERetornarSaldoCorreto()
+    {
+        // Given
+
+        // When
+        _contaCorrenteSaldo20.CalcularTarifaMensal();
+
+        // Then
+        Assert.Equal(-5m, _contaCorrenteSaldo20.ObterSaldo());
+        Assert.Equal(95m, _contaCorrenteSaldo20.ObterSaldoDisponivel());
+    }
+
+    // Teste de Exibir Extrato
+    [Fact]
+    public void DeveExibirExtratoERetornarSaldosCorretos()
+    {
+        _contaCorrente.Depositar(100m);
+        _contaCorrente.Depositar(255.25m);
+
+        _contaCorrente.Sacar(50m);
+        _contaCorrente.Transferir(_contaCorrenteDestino, 432.99m);
+
+        _contaCorrente.CalcularTarifaMensal();
+
+        _contaCorrente.Sacar(500m);
+
+        _contaCorrente.ExibirExtrato();
+
+        Assert.Equal(-307.52m, _contaCorrente.ObterSaldo());
+        Assert.Equal(1432.99m, _contaCorrenteDestino.ObterSaldo());
+
+        Assert.Equal(192.48m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(1732.99m, _contaCorrenteDestino.ObterSaldoDisponivel());
+    }
 }
+

@@ -37,15 +37,15 @@ namespace sistema_de_banco.Models
             {
                 Saldo += valor;
                 AtualizarSaldoDisponivel(1, valor);
-                Historico.Push($"Depósito: +{valor:C} | Saldo: {Saldo:C}");
+                Historico.Push($"Depósito: +{valor:C} | Saldo anterior: {Saldo - valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor <= 0)
             {
-                throw new ValorNegativo("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.");
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.");
             }
             else
             {
-                throw new ContaInativa("[ERRO] Conta inativa. Não é possível realizar o depósito.");
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o depósito.");
             }
         }
 
@@ -55,25 +55,25 @@ namespace sistema_de_banco.Models
             {
                 Saldo -= valor;
                 AtualizarSaldoDisponivel(2, valor);
-                Historico.Push($"Saque: -{valor:C} | Saldo: {Saldo:C}");
+                Historico.Push($"Saque: -{valor:C} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor && _saldoDisponivel >= valor)
             {
-                Saldo = valor - _saldoDisponivel;
-                AtualizarSaldoDisponivel(2, valor);
-                Historico.Push($"Saque: -{valor:C} (Cheque Especial) | Saldo: {Saldo:C} | Cheque Especial Disponível: {_saldoDisponivel:C}");
+                Saldo -= valor;
+                AtualizarSaldoDisponivel(2, valor); 
+                Historico.Push($"Saque: -{valor:C} (Cheque Especial) | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C} | Cheque Especial Disponível: {_saldoDisponivel:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor && _saldoDisponivel < valor)
             {
-                throw new SaldoInsuficiente("[ERRO] Saldo insuficiente. Não é possível realizar o saque.");
+                throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente. Não é possível realizar o saque.");
             }
             else if (Ativa && valor <= 0)
             {
-                throw new ValorNegativo("[ERRO] Valor deve ser positivo. Não é possível realizar o saque.");
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar o saque.");
             }
             else
             {
-                throw new ContaInativa("[ERRO] Conta inativa. Não é possível realizar o saque.");
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o saque.");
             }
         }
 
@@ -83,25 +83,27 @@ namespace sistema_de_banco.Models
             {
                 Saldo -= valor;
                 AtualizarSaldoDisponivel(2, valor);
-                Historico.Push($"Transferência: -{valor:C} | Saldo: {Saldo:C}");
+                destino.Depositar(valor);
+                Historico.Push($"Transferência: -{valor:C} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor && _saldoDisponivel >= valor)
             {
                 Saldo = valor - _saldoDisponivel;
                 AtualizarSaldoDisponivel(2, valor);
-                Historico.Push($"Transferência: -{valor:C} (Cheque Especial) | Saldo: {Saldo:C} | Cheque Especial Disponível: {_saldoDisponivel:C}");
+                destino.Depositar(valor);
+                Historico.Push($"Transferência: -{valor:C} (Cheque Especial) | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C} | Cheque Especial Disponível: {_saldoDisponivel:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor && _saldoDisponivel < valor)
             {
-                throw new SaldoInsuficiente("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.");
+                throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.");
             }
             else if (Ativa && valor <= 0)
             {
-                throw new ValorNegativo("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.");
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.");
             }
             else
             {
-                throw new ContaInativa("[ERRO] Conta inativa. Não é possível realizar a transferência.");
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar a transferência.");
             }
         }
 
@@ -111,7 +113,7 @@ namespace sistema_de_banco.Models
             {
                 Saldo -= _taxaManutencao;
                 AtualizarSaldoDisponivel(2, _taxaManutencao);
-                Historico.Push($"Tarifa Mensal: -{_taxaManutencao:C} | Saldo: {Saldo:C}");
+                Historico.Push($"Tarifa Mensal: -{_taxaManutencao:C} | Saldo anterior: {Saldo + _taxaManutencao:C} | Saldo atual: {Saldo:C}");
             }
             else if (Saldo < _taxaManutencao)
             {

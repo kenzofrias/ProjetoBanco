@@ -32,11 +32,11 @@ namespace sistema_de_banco.Models
             }
             else if (Ativa && valor <= 0)
             {
-                throw new ValorNegativo("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.");
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.");
             }
             else
             {
-                throw new ContaInativa("[ERRO] Conta inativa. Não é possível realizar o depósito.");
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o depósito.");
             }
         }
 
@@ -49,15 +49,15 @@ namespace sistema_de_banco.Models
             }
             else if (Ativa && valor > 0 && Saldo < valor)
             {
-                throw new SaldoInsuficiente("[ERRO] Saldo insuficiente. Não é possível realizar o saque.");
+                throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente. Não é possível realizar o saque.");
             }
             else if (Ativa && valor <= 0)
             {
-                throw new ValorNegativo("[ERRO] Valor deve ser positivo. Não é possível realizar o saque.");
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar o saque.");
             }
             else
             {
-                throw new ContaInativa("[ERRO] Conta inativa. Não é possível realizar o saque.");
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o saque.");
             }
         }
 
@@ -72,15 +72,15 @@ namespace sistema_de_banco.Models
             }
             else if (Ativa && valor > 0 && Saldo < valor)
             {
-                throw new SaldoInsuficiente("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.");
+                throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.");
             }
             else if (Ativa && valor <= 0)
             {
-                throw new ValorNegativo("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.");
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.");
             }
             else
             {
-                throw new ContaInativa("[ERRO] Conta inativa. Não é possível realizar a transferência.");
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar a transferência.");
             }
         }
 
