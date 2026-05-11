@@ -39,7 +39,7 @@ projeto-banco/
 * **`demo-banco/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
 * **`teste-sistema-de-banco/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
 
----
+
 
 ## 🧩 Classes e Modelos Principais
 
@@ -69,7 +69,7 @@ Herda de `Conta`. Ideal para o acúmulo de patrimônio, oferecendo taxa de juros
   * Diferente da conta corrente, **não possui cheque especial**. Qualquer saque ou transferência superior ao valor real guardado é negado imediatamente.
   * `AplicarRendimento()`: Calcula o percentual de juros determinado no construtor e o adiciona ao saldo. Apenas é aplicado se o saldo for maior que zero.
 
----
+
 
 ## ⚠️ Tratamento de Exceções
 
@@ -78,7 +78,7 @@ O sistema implementa uma camada de segurança robusta baseada em Exceções cust
 * `SaldoInsuficienteException`: Disparada quando a conta não possui fundos suficientes para a operação (levando em conta que a poupança usa saldo base, enquanto a corrente considera saldo + limite).
 * `ContaInativaException`: Dispara caso haja problema na instanciação da propriedade `Ativa` (por padrão é `false`).
 
----
+
 
 ## ✅ Testes Unitários
 
@@ -88,7 +88,7 @@ O projeto foi construído focando em qualidade, contando com extensivos testes a
 * **Transferências:** Débito atômico na origem e crédito correto e sincronizado no destino.
 * **Mecânicas Específicas:** Testes aplicando vários meses (loops) de juros na poupança e observando se o valor bate; testes cobrando mensalidade de clientes de conta corrente zerada e garantindo o uso correto do limite para cobrir a taxa.
 
----
+
 
 ## 🌟 Boas Práticas Aplicadas
 
@@ -98,7 +98,7 @@ Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reco
 * **Tratamento de Exceções de Domínio:** Adoção de arquitetura resiliente substituindo retornos booleanos tradicionais por exceções de domínio semanticamente ricas (`SaldoInsuficienteException`, `ValorInsuficienteException`, `ContaInativaException`).
 * **Testes Unitários Bem Estruturados:** Construção de testes utilizando as convenções **AAA** (Arrange, Act, Assert) estruturadas via comentários **Given, When, Then**, cobrindo o caminho feliz e casos extremos para proteger a aplicação de regressões.
 * **Clean Code:** Código limpo e autoexplicativo com nomenclatura clara em português, divisão de responsabilidades claras (camadas de _Models_ e _Exceptions_) e métodos objetivos.
----
+
 
 ## 🚀 Como Executar o Projeto
 
@@ -123,7 +123,7 @@ Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reco
    ```
    *Você verá a validação das regras de negócio atestadas como "Passed".*
 
----
+
 
 ## 📌 Considerações
 
