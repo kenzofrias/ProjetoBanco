@@ -4,14 +4,34 @@ Um sistema bancário completo e robusto desenvolvido em C# utilizando os princí
 
 ## 📁 Estrutura do Projeto
 
+```
+projeto-banco/
+│
+├── 📂 sistema-de-banco/
+│   ├── 📂 Models/
+|   |    ├── 📄 Conta.cs
+│   |    ├── 📄 ContaCorrente.cs
+│   |    └── 📄 ContaPoupanca.cs
+│   └── 📂 Exceptions/
+|        ├── 📄 SaldoInsuficienteException.cs
+|        ├── 📄 ValorInsuficienteException.cs
+|        └── 📄 ContaInativaException.cs
+│
+├── 📂 demo-banco/
+│    └── 📄 Program.cs
+│
+└── 📂 teste-sistema-de-banco/
+     ├── 📄 ContaCorrenteTests.cs
+     └── 📄 ContaPoupancaTests.cs
+```
+
 A solução é dividida em três projetos principais, seguindo boas práticas de modularização e separação de responsabilidades:
 
 * **`sistema-de-banco/`**: A biblioteca de classes (Class Library) principal contendo as regras e o domínio do negócio.
   * `Models/`: Contém as entidades centrais do sistema (`Conta`, `ContaCorrente`, `ContaPoupanca`).
-  * `Exceptions/`: Contém as exceções personalizadas para o controle de domínio (`SaldoInsuficienteException`, `ValorInsuficienteException`).
+  * `Exceptions/`: Contém as exceções personalizadas para o controle de domínio (`SaldoInsuficienteException`, `ValorInsuficienteException`,`ContaInativaException`).
 * **`demo-banco/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
 * **`teste-sistema-de-banco/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
-* `DetalhamentoProjeto.tldr`: Arquivo de design visual ou modelagem do projeto.
 
 ---
 
