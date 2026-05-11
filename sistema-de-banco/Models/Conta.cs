@@ -8,10 +8,10 @@ namespace sistema_de_banco.Models
 {
     public abstract class Conta
     {
-        protected string Numero { get; set; }
-        protected string Titular { get; set; }
+        protected string Numero { get; private set; }
+        protected string Titular { get; private set; }
         protected decimal Saldo { get; set; }
-        public bool Ativa { get; set; } = false;
+        protected bool Ativa { get; private set; } = false; 
         protected Stack<string> Historico;
 
         public Conta(string numero, string titular, decimal saldo)
