@@ -31,13 +31,18 @@ namespace sistema_de_banco.Models
             }
         }
 
-        public override void Depositar(decimal valor)
+        public override void Depositar(decimal valor, int operacao)
         {
-            if (Ativa && valor > 0)
+            if (Ativa && valor > 0 && operacao == 1)
             {
                 Saldo += valor;
                 AtualizarSaldoDisponivel(1, valor);
                 Historico.Push($"Depósito: +{valor:C} | Saldo anterior: {Saldo - valor:C} | Saldo atual: {Saldo:C}");
+            } else if (Ativa && valor > 0 && operacao == 2)
+            {
+                Saldo += valor;
+                AtualizarSaldoDisponivel(1, valor);
+                Historico.Push($"Transferência recebida: +{valor:C} | Saldo anterior: {Saldo - valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor <= 0)
             {
@@ -83,14 +88,14 @@ namespace sistema_de_banco.Models
             {
                 Saldo -= valor;
                 AtualizarSaldoDisponivel(2, valor);
-                destino.Depositar(valor);
-                Historico.Push($"Transferência: -{valor:C} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
+                destino.Depositar(valor, 2);
+                Historico.Push($"Transferência: -{valor:C} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C} | Cheque Especial Disponível: {_saldoDisponivel:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor && _saldoDisponivel >= valor)
             {
                 Saldo = valor - _saldoDisponivel;
                 AtualizarSaldoDisponivel(2, valor);
-                destino.Depositar(valor);
+                destino.Depositar(valor, 2);
                 Historico.Push($"Transferência: -{valor:C} (Cheque Especial) | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C} | Cheque Especial Disponível: {_saldoDisponivel:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor && _saldoDisponivel < valor)
@@ -124,5 +129,6 @@ namespace sistema_de_banco.Models
         }
 
         public decimal ObterSaldoDisponivel() => _saldoDisponivel;
+        public override string ToString() => $"Titular: {Titular} | Saldo: {Saldo:C} | Saldo Disponível (Cheque Especial): {_saldoDisponivel:C}";
     }
 }

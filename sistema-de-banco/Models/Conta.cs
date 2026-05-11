@@ -23,12 +23,16 @@ namespace sistema_de_banco.Models
             Historico = new Stack<string>();
         }
 
-        public virtual void Depositar(decimal valor) 
+        public virtual void Depositar(decimal valor, int operacao) 
         {
-            if (Ativa && valor > 0)
+            if (Ativa && valor > 0 && operacao == 1)
             {
                 Saldo += valor;
                 Historico.Push($"Depósito: +{valor:C} | Saldo anterior: {Saldo - valor:C} | Saldo atual: {Saldo:C}");
+            } else if (Ativa && valor > 0 && operacao == 2)
+            {
+                Saldo += valor;
+                Historico.Push($"Transferência recebida: +{valor:C} | Saldo anterior: {Saldo - valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor <= 0)
             {
@@ -66,9 +70,8 @@ namespace sistema_de_banco.Models
             if (Ativa && valor > 0 && Saldo >= valor)
             {
                 Saldo -= valor;
-                destino.Depositar(valor);
-                Historico.Push($"Transferência: -{valor:C} para {destino.Titular} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
-                destino.Historico.Push($"Transferência: +{valor:C} de {Titular} | Saldo anterior: {destino.Saldo - valor:C} | Saldo atual: {destino.Saldo:C}");
+                destino.Depositar(valor, 2);
+                Historico.Push($"Transferência: -{valor:C} | Saldo anterior: {Saldo + valor:C} | Saldo atual: {Saldo:C}");
             }
             else if (Ativa && valor > 0 && Saldo < valor)
             {
@@ -103,6 +106,8 @@ namespace sistema_de_banco.Models
         }
 
         public decimal ObterSaldo() => Math.Round(Saldo, 2);
+
+        public override string ToString() => $"Titular: {Titular} | Saldo: {Saldo:C}";
 
         public virtual void CalcularTarifaMensal() { }
         public virtual void AplicarRendimento() { }
