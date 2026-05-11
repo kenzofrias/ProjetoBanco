@@ -2,7 +2,15 @@
 
 Um sistema bancário completo e robusto desenvolvido em C# utilizando os princípios da Programação Orientada a Objetos (POO). O projeto simula operações bancárias do mundo real, incluindo gestão de contas corrente e poupança, limites de cheque especial, rendimentos, tarifas, transferências e testes unitários automatizados.
 
-## 📁 Estrutura do Projeto
+## 🛠️ Tecnologias Utilizadas
+
+* **C#** (Linguagem de programação principal)
+* **.NET SDK** (Plataforma e ecossistema de desenvolvimento)
+* **xUnit** (Framework utilizado para a criação dos testes unitários)
+
+## 🗂️ Estrutura do Projeto
+
+A solução é dividida em três projetos principais, seguindo boas práticas de modularização e separação de responsabilidades:
 
 ```
 projeto-banco/
@@ -24,8 +32,6 @@ projeto-banco/
      ├── 📄 ContaCorrenteTests.cs
      └── 📄 ContaPoupancaTests.cs
 ```
-
-A solução é dividida em três projetos principais, seguindo boas práticas de modularização e separação de responsabilidades:
 
 * **`sistema-de-banco/`**: A biblioteca de classes (Class Library) principal contendo as regras e o domínio do negócio.
   * `Models/`: Contém as entidades centrais do sistema (`Conta`, `ContaCorrente`, `ContaPoupanca`).
@@ -70,6 +76,7 @@ Herda de `Conta`. Ideal para o acúmulo de patrimônio, oferecendo taxa de juros
 O sistema implementa uma camada de segurança robusta baseada em Exceções customizadas, não permitindo operações inconsistentes:
 * `ValorInsuficienteException`: Disparada imediatamente caso um usuário tente depositar, sacar ou transferir valores negativos (ex: `-100m`) ou zerados (`0m`).
 * `SaldoInsuficienteException`: Disparada quando a conta não possui fundos suficientes para a operação (levando em conta que a poupança usa saldo base, enquanto a corrente considera saldo + limite).
+* `ContaInativaException`: Dispara caso haja problema na instanciação da propriedade `Ativa` (por padrão é `false`).
 
 ---
 
@@ -81,6 +88,16 @@ O projeto foi construído focando em qualidade, contando com extensivos testes a
 * **Transferências:** Débito atômico na origem e crédito correto e sincronizado no destino.
 * **Mecânicas Específicas:** Testes aplicando vários meses (loops) de juros na poupança e observando se o valor bate; testes cobrando mensalidade de clientes de conta corrente zerada e garantindo o uso correto do limite para cobrir a taxa.
 
+---
+
+## 🌟 Boas Práticas Aplicadas
+
+Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reconhecidas na engenharia de software:
+
+* **Programação Orientada a Objetos (POO):** Uso massivo de Herança (`ContaPoupanca` e `ContaCorrente` derivando de `Conta`), Encapsulamento (controle rígido de estado interno) e Polimorfismo (sobrescrita de métodos de saque e rendimento).
+* **Tratamento de Exceções de Domínio:** Adoção de arquitetura resiliente substituindo retornos booleanos tradicionais por exceções de domínio semanticamente ricas (`SaldoInsuficienteException`, `ValorInsuficienteException`, `ContaInativaException`).
+* **Testes Unitários Bem Estruturados:** Construção de testes utilizando as convenções **AAA** (Arrange, Act, Assert) estruturadas via comentários **Given, When, Then**, cobrindo o caminho feliz e casos extremos para proteger a aplicação de regressões.
+* **Clean Code:** Código limpo e autoexplicativo com nomenclatura clara em português, divisão de responsabilidades claras (camadas de _Models_ e _Exceptions_) e métodos objetivos.
 ---
 
 ## 🚀 Como Executar o Projeto
@@ -108,4 +125,19 @@ O projeto foi construído focando em qualidade, contando com extensivos testes a
 
 ---
 
-*Projeto desenvolvido com intuito prático para solidificação de conceitos de C#, Orientação a Objetos, Testes Unitários (TDD) e Tratamento de Erros e Exceções.*
+## 📌 Considerações
+
+Este projeto foi desenvolvido com foco em consolidar conhecimentos em:
+- **Programação Orientada a Objetos (POO):** Abstração, herança e polimorfismo.
+- **Modelagem de Domínio:** Tradução de regras de negócio reais para código (limites, tarifas, rendimentos).
+- **Qualidade de Software:** Criação de testes unitários automatizados utilizando o framework xUnit.
+- **Resiliência:** Tratamento robusto de erros criando exceções customizadas da aplicação.
+- **Modularidade:** Separação de responsabilidades entre regras de negócio (Class Library) e interface (Console App).
+---
+
+<div align="center">
+  
+  **Obrigado pela visita!**  
+  [Kenzo Friás](https://www.github.com/kenzofrias) © 2026
+  
+</div>
