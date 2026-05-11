@@ -133,6 +133,10 @@ Este projeto foi desenvolvido com foco em consolidar conhecimentos em:
 - **Qualidade de Software:** Criação de testes unitários automatizados utilizando o framework xUnit.
 - **Resiliência:** Tratamento robusto de erros criando exceções customizadas da aplicação.
 - **Modularidade:** Separação de responsabilidades entre regras de negócio (Class Library) e interface (Console App).
+
+## 📝 Licença
+Esse projeto está sob licença. Veja o arquivo [LICENÇA](LICENSE) para mais detalhes.
+
 ---
 
 <div align="center">
