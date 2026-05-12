@@ -39,6 +39,145 @@ projeto-banco/
 * **`demo-banco/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
 * **`teste-sistema-de-banco/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
 
+## 📊 Diagrama de Classes (UML)
+
+Abaixo está o diagrama UML que representa a estrutura principal do domínio do projeto:
+
+```mermaid
+classDiagram
+    class Conta {
+        <<abstract>>
+        #string Numero
+        #string Titular
+        #decimal Saldo
+        #bool Ativa
+        #Stack~string~ Historico
+        +Depositar(decimal valor, int operacao)*
+        +Sacar(decimal valor)*
+        +Transferir(Conta destino, decimal valor)*
+        +ObterSaldo() decimal
+        +ObterSaldoDisponivel() decimal
+        +ExibirExtrato()
+        +ToString() string
+        +AplicarRendimento()
+        +CalcularTarifaMensal()
+    }
+
+    class ContaCorrente {
+        -decimal _limiteChequeEspecial
+        -decimal _saldoDisponivel
+        -decimal _taxaManutencao
+        -AtualizarSaldoDisponivel(int operacao, decimal valor)
+        +Depositar(decimal valor, int operacao)
+        +Sacar(decimal valor)
+        +Transferir(Conta destino, decimal valor)
+        +CalcularTarifaMensal()
+        +ObterSaldoDisponivel() decimal
+        +ToString() string
+    }
+
+    class ContaPoupanca {
+        -decimal _taxaRendimento
+        +AplicarRendimento()
+    }
+
+    class Exception {
+        <<System>>
+    }
+
+    class SaldoInsuficienteException
+    class ValorInsuficienteException
+    class ContaInativaException
+
+    Conta <|-- ContaCorrente
+    Conta <|-- ContaPoupanca
+    
+    Exception <|-- SaldoInsuficienteException
+    Exception <|-- ValorInsuficienteException
+    Exception <|-- ContaInativaException
+```
+
+## 🔄 Fluxo de Transferência (Diagrama de Sequência)
+
+Abaixo está o diagrama de sequência detalhando como ocorre a comunicação e as validações entre os objetos durante uma operação de `transferência`: 
+
+```mermaid
+sequenceDiagram
+    actor Cliente
+    participant Origem as Conta (Origem)
+    participant Destino as Conta (Destino)
+    
+    Cliente->>Origem: Transferir(destino, valor)
+    activate Origem
+    
+    alt Validação de Sucesso (Ativa, Valor > 0, Saldo/Limite OK)
+        Origem->>Origem: Deduz valor do Saldo / Saldo Disponível
+        Origem->>Destino: Depositar(valor, operacao: 2)
+        activate Destino
+        Destino->>Destino: Adiciona valor ao Saldo / Saldo Disponível
+        Destino->>Destino: Registra no Histórico (Transferência Recebida)
+        Destino-->>Origem: Retorno (Sucesso)
+        deactivate Destino
+        Origem->>Origem: Registra no Histórico (Transferência Realizada)
+        Origem-->>Cliente: Operação Concluída
+    else Falha de Validação (Conta Inativa, Valor <= 0 ou Sem Saldo)
+        Origem-->>Cliente: Lança Exceção (ex: SaldoInsuficienteException)
+    end
+    
+    deactivate Origem
+```
+
+## 🏧 Fluxo de Saque (Conta Corrente com Cheque Especial)
+
+Este diagrama demonstra a lógica de saque na `ContaCorrente`, que verifica não apenas o saldo real, mas também o limite do cheque especial antes de aprovar a transação.
+
+```mermaid 
+sequenceDiagram
+  actor Cliente
+  participant Conta as ContaCorrente
+  
+  Cliente->>Conta: Sacar(valor)
+  activate Conta
+
+  alt Valor inválido (valor <= 0)
+    Conta-->>Cliente: Lança ValorInsuficienteException
+  else Saldo e Limite Suficientes
+   Conta->>Conta: Deduz do Saldo Real (pode ficar negativo)
+   Conta->>Conta: Atualiza Saldo Disponível (deduz do limite)
+   Conta->>Conta: Registra Saque no Histórico
+   Conta-->>Cliente: Operação Concluída
+  else Saldo e Limite Insuficientes
+   Conta-->>Cliente: Lança SaldoInsuficienteException
+  end
+  
+  deactivate Conta
+```
+
+## 📈 Fluxo de Rendimento (Conta Poupança)
+
+A operação de rendimento na `ContaPoupanca` possui condicionais importantes: a conta precisa estar ativa e possuir saldo estritamente maior que zero.
+
+```mermaid
+sequenceDiagram
+  actor Sistema
+  participant Conta as ContaPoupanca
+  
+  Sistema->>Conta: AplicarRendimento()
+  activate Conta
+  
+  alt Conta Ativa e Saldo > 0
+   Conta->>Conta: Calcula rendimento (Saldo * _taxaRendimento)
+   Conta->>Conta: Adiciona rendimento ao Saldo
+   Conta->>Conta: Registra Rendimento no Histórico
+   Conta-->>Sistema: Rendimento Aplicado com Sucesso
+  else Saldo Zerado ou Negativo (<= 0)
+   Conta-->>Sistema: Lança SaldoInsuficienteException
+  else Conta Inativa
+   Conta-->>Sistema: Lança ContaInativaException
+  end
+
+  deactivate Conta
+```
 
 
 ## 🧩 Classes e Modelos Principais
