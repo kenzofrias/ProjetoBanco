@@ -23,7 +23,7 @@ public class ContaCorrenteTests
     {
         decimal valorDeposito = 500m;
 
-        _contaCorrente.Depositar(valorDeposito);
+        _contaCorrente.Depositar(valorDeposito,1);
 
         Assert.Equal(845.22m, _contaCorrente.ObterSaldo());
         Assert.Equal(1345.22m, _contaCorrente.ObterSaldoDisponivel());
@@ -34,7 +34,7 @@ public class ContaCorrenteTests
     {
         decimal valorDeposito = 722m;
 
-        _contaCorrente.Depositar(valorDeposito);
+        _contaCorrente.Depositar(valorDeposito,1);
 
         Assert.Equal(1067.22m, _contaCorrente.ObterSaldo());
         Assert.Equal(1567.22m, _contaCorrente.ObterSaldoDisponivel());
@@ -47,7 +47,7 @@ public class ContaCorrenteTests
         decimal valorDeposito = -200m;
         // When
         var ex = Assert.Throws<ValorInsuficienteException>(
-        () => _contaCorrente.Depositar(valorDeposito));
+        () => _contaCorrente.Depositar(valorDeposito,1));
 
         // Then
         Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
@@ -60,7 +60,7 @@ public class ContaCorrenteTests
         decimal valorDeposito = 0m;
         // When
         var ex = Assert.Throws<ValorInsuficienteException>(
-        () => _contaCorrente.Depositar(valorDeposito));
+        () => _contaCorrente.Depositar(valorDeposito,1));
 
         // Then
         Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
@@ -70,9 +70,9 @@ public class ContaCorrenteTests
     public void DeveFazerVariosDepositosERetonarSaldoCorretoFinal()
     {
         // When
-        _contaCorrente.Depositar(100m);
-        _contaCorrente.Depositar(505.35m);
-        _contaCorrente.Depositar(92.45m);
+        _contaCorrente.Depositar(100m,1);
+        _contaCorrente.Depositar(505.35m,1);
+        _contaCorrente.Depositar(92.45m,1);
 
         // Then
         Assert.Equal(1043.02m, _contaCorrente.ObterSaldo());
@@ -255,8 +255,8 @@ public class ContaCorrenteTests
     [Fact]
     public void DeveExibirExtratoERetornarSaldosCorretos()
     {
-        _contaCorrente.Depositar(100m);
-        _contaCorrente.Depositar(255.25m);
+        _contaCorrente.Depositar(100m,1);
+        _contaCorrente.Depositar(255.25m,1);
 
         _contaCorrente.Sacar(50m);
         _contaCorrente.Transferir(_contaCorrenteDestino, 432.99m);

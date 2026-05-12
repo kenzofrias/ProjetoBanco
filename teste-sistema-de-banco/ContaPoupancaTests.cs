@@ -25,7 +25,7 @@ namespace teste_sistema_de_banco;
         {
             decimal valorDeposito = 100m;
 
-            _contaPoupanca.Depositar(valorDeposito);
+            _contaPoupanca.Depositar(valorDeposito,1);
 
             Assert.Equal(1100m, _contaPoupanca.ObterSaldo());
         }
@@ -36,7 +36,7 @@ namespace teste_sistema_de_banco;
             decimal valorDeposito = -100m;
 
             var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Depositar(valorDeposito));
+                () => _contaPoupanca.Depositar(valorDeposito,1));
 
             Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
         }
@@ -47,7 +47,7 @@ namespace teste_sistema_de_banco;
             decimal valorDeposito = 0m;
 
             var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Depositar(valorDeposito));
+                () => _contaPoupanca.Depositar(valorDeposito,1));
 
             Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
         }
