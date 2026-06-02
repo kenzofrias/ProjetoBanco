@@ -1,4 +1,4 @@
-﻿using sistema_de_banco.Models;
+﻿using ProjetoBanco.Core.Models;
 
 // Contas Corrente
 Conta c1 = new ContaCorrente("12345", "João C O Silva", 1200m, 500m);

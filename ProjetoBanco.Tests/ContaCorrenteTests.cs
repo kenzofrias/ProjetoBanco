@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
-using sistema_de_banco.Exceptions;
-using sistema_de_banco.Models;
+using ProjetoBanco.Core.Exceptions;
+using ProjetoBanco.Core.Models;
 using System.Text;
 
-namespace teste_sistema_de_banco;
+namespace ProjetoBanco.Tests;
 
 public class ContaCorrenteTests
 {
@@ -204,6 +204,7 @@ public class ContaCorrenteTests
 
         // Then
         Assert.Equal(-345.22m, _contaCorrente.ObterSaldo());
+        Assert.Equal(-154.78m, _contaCorrente.ObterSaldo());
         Assert.Equal(1500m, _contaCorrenteDestino.ObterSaldo());
 
         Assert.Equal(345.22m, _contaCorrente.ObterSaldoDisponivel());

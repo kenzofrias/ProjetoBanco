@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
-using sistema_de_banco.Exceptions;
+using ProjetoBanco.Core.Exceptions;
 
-namespace sistema_de_banco.Models
+namespace ProjetoBanco.Core.Models
 {
     public class ContaPoupanca : Conta
     {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>teste_sistema_de_banco</RootNamespace>
+    <RootNamespace>ProjetoBanco.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\sistema-de-banco\sistema-de-banco.csproj" />
+    <ProjectReference Include="..\ProjetoBanco.Core\ProjetoBanco.Core.csproj" />
   </ItemGroup>
 
 </Project>

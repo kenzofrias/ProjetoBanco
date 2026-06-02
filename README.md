@@ -13,9 +13,9 @@ Um sistema bancário completo e robusto desenvolvido em C# utilizando os princí
 A solução é dividida em três projetos principais, seguindo boas práticas de modularização e separação de responsabilidades:
 
 ```
-projeto-banco/
+ProjetoBanco/
 │
-├── 📂 sistema-de-banco/
+├── 📂 ProjetoBanco.Core/
 │   ├── 📂 Models/
 |   |    ├── 📄 Conta.cs
 │   |    ├── 📄 ContaCorrente.cs
@@ -25,19 +25,19 @@ projeto-banco/
 |        ├── 📄 ValorInsuficienteException.cs
 |        └── 📄 ContaInativaException.cs
 │
-├── 📂 demo-banco/
+├── 📂 ProjetoBanco.ConsoleApp/
 │    └── 📄 Program.cs
 │
-└── 📂 teste-sistema-de-banco/
+└── 📂 ProjetoBanco.Tests/
      ├── 📄 ContaCorrenteTests.cs
      └── 📄 ContaPoupancaTests.cs
 ```
 
-* **`sistema-de-banco/`**: A biblioteca de classes (Class Library) principal contendo as regras e o domínio do negócio.
+* **`ProjetoBanco.Core/`**: A biblioteca de classes (Class Library) principal contendo as regras e o domínio do negócio.
   * `Models/`: Contém as entidades centrais do sistema (`Conta`, `ContaCorrente`, `ContaPoupanca`).
   * `Exceptions/`: Contém as exceções personalizadas para o controle de domínio (`SaldoInsuficienteException`, `ValorInsuficienteException`,`ContaInativaException`).
-* **`demo-banco/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
-* **`teste-sistema-de-banco/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
+* **`ProjetoBanco.ConsoleApp/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
+* **`ProjetoBanco.Tests/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
 
 
 ## 📊 Diagrama de Classes (UML)
@@ -230,7 +230,7 @@ Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reco
 
 ## ✅ Testes Unitários
 
-O projeto foi construído focando em qualidade, contando com extensivos testes automatizados na pasta `teste-sistema-de-banco`. Estão cobertos cenários como:
+O projeto foi construído focando em qualidade, contando com extensivos testes automatizados na pasta `ProjetoBanco.Core.Tests`. Estão cobertos cenários como:
 * **Depósitos:** Acúmulo progressivo de saldo, rejeição rigorosa de valores negativos e zeros.
 * **Saques:** Atualização correta do *saldo real* vs *saldo disponível*. Testes validando o bloqueio de saques fora de limites ou saques que usam parte do limite especial.
 * **Transferências:** Débito atômico na origem e crédito correto e sincronizado no destino.
@@ -248,14 +248,14 @@ O projeto foi construído focando em qualidade, contando com extensivos testes a
 2. Abra o terminal na pasta raiz do projeto.
 3. **Para ver o programa funcionando na prática (Console):**
    ```bash
-   cd demo-banco
+   cd ProjetoBanco.ConsoleApp
    dotnet run
    ```
    *O console exibirá criações de contas, transferências sendo feitas, o impacto do cheque especial e a listagem dos extratos finais.*
 
 4. **Para rodar a bateria de testes automatizados e validar o código:**
    ```bash
-   cd teste-sistema-de-banco
+   cd ProjetoBanco.Tests
    dotnet test
    ```
    *Você verá a validação das regras de negócio atestadas como "Passed".*

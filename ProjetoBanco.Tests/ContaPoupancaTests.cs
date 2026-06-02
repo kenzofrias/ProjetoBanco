@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
-using sistema_de_banco.Models;
-using sistema_de_banco.Exceptions;
+using ProjetoBanco.Core.Models;
+using ProjetoBanco.Core.Exceptions;
 
-namespace teste_sistema_de_banco;
+namespace ProjetoBanco.Tests;
 
     public class ContaPoupancaTests
     {

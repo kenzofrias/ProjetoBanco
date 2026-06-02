@@ -1,10 +1,11 @@
-demo-banco/obj
-demo-banco/bin
+ProjetoBanco.ConsoleApp/obj
+ProjetoBanco.ConsoleApp/bin
 
-sistema-de-banco/obj
-sistema-de-banco/bin
+ProjetoBanco.Core/obj
+ProjetoBanco.Core/bin
 
-teste-sistema-de-banco/obj
-teste-sistema-de-banco/bin
+ProjetoBanco.Tests/obj
+ProjetoBanco.Tests/bin
 
 DetalhamentoProjeto.tldr
+Propostas.txt
