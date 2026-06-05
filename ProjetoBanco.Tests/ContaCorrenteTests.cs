@@ -23,10 +23,10 @@ public class ContaCorrenteTests
     {
         decimal valorDeposito = 500m;
 
-        _contaCorrente.Depositar(valorDeposito,1);
+        _contaCorrente.Depositar(valorDeposito);
 
-        Assert.Equal(845.22m, _contaCorrente.ObterSaldo());
-        Assert.Equal(1345.22m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(845.22m, _contaCorrente.Saldo);
+        Assert.Equal(1345.22m, _contaCorrente.SaldoDisponivel);
     }
 
     [Fact]
@@ -34,10 +34,10 @@ public class ContaCorrenteTests
     {
         decimal valorDeposito = 722m;
 
-        _contaCorrente.Depositar(valorDeposito,1);
+        _contaCorrente.Depositar(valorDeposito);
 
-        Assert.Equal(1067.22m, _contaCorrente.ObterSaldo());
-        Assert.Equal(1567.22m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(1067.22m, _contaCorrente.Saldo);
+        Assert.Equal(1567.22m, _contaCorrente.SaldoDisponivel);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class ContaCorrenteTests
         decimal valorDeposito = -200m;
         // When
         var ex = Assert.Throws<ValorInsuficienteException>(
-        () => _contaCorrente.Depositar(valorDeposito,1));
+        () => _contaCorrente.Depositar(valorDeposito));
 
         // Then
         Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
@@ -60,7 +60,7 @@ public class ContaCorrenteTests
         decimal valorDeposito = 0m;
         // When
         var ex = Assert.Throws<ValorInsuficienteException>(
-        () => _contaCorrente.Depositar(valorDeposito,1));
+        () => _contaCorrente.Depositar(valorDeposito));
 
         // Then
         Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
@@ -70,13 +70,13 @@ public class ContaCorrenteTests
     public void DeveFazerVariosDepositosERetonarSaldoCorretoFinal()
     {
         // When
-        _contaCorrente.Depositar(100m,1);
-        _contaCorrente.Depositar(505.35m,1);
-        _contaCorrente.Depositar(92.45m,1);
+        _contaCorrente.Depositar(100m);
+        _contaCorrente.Depositar(505.35m);
+        _contaCorrente.Depositar(92.45m);
 
         // Then
-        Assert.Equal(1043.02m, _contaCorrente.ObterSaldo());
-        Assert.Equal(1543.02m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(1043.02m, _contaCorrente.Saldo);
+        Assert.Equal(1543.02m, _contaCorrente.SaldoDisponivel);
     }
 
     // Testes de saque
@@ -92,8 +92,8 @@ public class ContaCorrenteTests
         _contaCorrente.Sacar(valorSaqueDois);
 
         // Then
-        Assert.Equal(140m, _contaCorrente.ObterSaldo());
-        Assert.Equal(640m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(140m, _contaCorrente.Saldo);
+        Assert.Equal(640m, _contaCorrente.SaldoDisponivel);
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public class ContaCorrenteTests
         _contaCorrente.Sacar(valorSaque);
 
         // Then
-        Assert.Equal(-154.78m, _contaCorrente.ObterSaldo());
-        Assert.Equal(345.22m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(-154.78m, _contaCorrente.Saldo);
+        Assert.Equal(345.22m, _contaCorrente.SaldoDisponivel);
     }
 
     [Fact]
@@ -131,8 +131,8 @@ public class ContaCorrenteTests
         _contaCorrente.Sacar(55m);
         _contaCorrente.Sacar(359.22m);
 
-        Assert.Equal(-169m, _contaCorrente.ObterSaldo());
-        Assert.Equal(331m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(-169m, _contaCorrente.Saldo);
+        Assert.Equal(331m, _contaCorrente.SaldoDisponivel);
     }
 
     [Fact]
@@ -186,11 +186,11 @@ public class ContaCorrenteTests
         _contaCorrente.Transferir(_contaCorrenteDestino, valorTransferencia);
 
         // Then
-        Assert.Equal(145.22m, _contaCorrente.ObterSaldo());
-        Assert.Equal(1200m, _contaCorrenteDestino.ObterSaldo());
+        Assert.Equal(145.22m, _contaCorrente.Saldo);
+        Assert.Equal(1200m, _contaCorrenteDestino.Saldo);
 
-        Assert.Equal(645.22m, _contaCorrente.ObterSaldoDisponivel());
-        Assert.Equal(1500m, _contaCorrenteDestino.ObterSaldoDisponivel());
+        Assert.Equal(645.22m, _contaCorrente.SaldoDisponivel);
+        Assert.Equal(1500m, _contaCorrenteDestino.SaldoDisponivel);
     }
 
     [Fact]
@@ -202,13 +202,12 @@ public class ContaCorrenteTests
         // When
         _contaCorrente.Transferir(_contaCorrenteDestino, valorTransferencia);
 
-        // Then
-        Assert.Equal(-345.22m, _contaCorrente.ObterSaldo());
-        Assert.Equal(-154.78m, _contaCorrente.ObterSaldo());
-        Assert.Equal(1500m, _contaCorrenteDestino.ObterSaldo());
+        // Assert
+        Assert.Equal(-154.78m, _contaCorrente.Saldo);
+        Assert.Equal(1500m, _contaCorrenteDestino.Saldo);
 
-        Assert.Equal(345.22m, _contaCorrente.ObterSaldoDisponivel());
-        Assert.Equal(1800m, _contaCorrenteDestino.ObterSaldoDisponivel());
+        Assert.Equal(345.22m, _contaCorrente.SaldoDisponivel);
+        Assert.Equal(1800m, _contaCorrenteDestino.SaldoDisponivel);
     }
 
     [Fact]
@@ -235,8 +234,8 @@ public class ContaCorrenteTests
         _contaCorrente.CalcularTarifaMensal();
 
         // Then
-        Assert.Equal(320.22m, _contaCorrente.ObterSaldo());
-        Assert.Equal(820.22m, _contaCorrente.ObterSaldoDisponivel());
+        Assert.Equal(325.22m, _contaCorrente.Saldo);
+        Assert.Equal(825.22m, _contaCorrente.SaldoDisponivel);
     }
 
     [Fact]
@@ -248,16 +247,16 @@ public class ContaCorrenteTests
         _contaCorrenteSaldo20.CalcularTarifaMensal();
 
         // Then
-        Assert.Equal(-5m, _contaCorrenteSaldo20.ObterSaldo());
-        Assert.Equal(95m, _contaCorrenteSaldo20.ObterSaldoDisponivel());
+        Assert.Equal(0m, _contaCorrenteSaldo20.Saldo);
+        Assert.Equal(100m, _contaCorrenteSaldo20.SaldoDisponivel);
     }
 
     // Teste de Exibir Extrato
     [Fact]
     public void DeveExibirExtratoERetornarSaldosCorretos()
     {
-        _contaCorrente.Depositar(100m,1);
-        _contaCorrente.Depositar(255.25m,1);
+        _contaCorrente.Depositar(100m);
+        _contaCorrente.Depositar(255.25m);
 
         _contaCorrente.Sacar(50m);
         _contaCorrente.Transferir(_contaCorrenteDestino, 432.99m);
@@ -268,11 +267,11 @@ public class ContaCorrenteTests
 
         _contaCorrente.ExibirExtrato();
 
-        Assert.Equal(-307.52m, _contaCorrente.ObterSaldo());
-        Assert.Equal(1432.99m, _contaCorrenteDestino.ObterSaldo());
+        Assert.Equal(-302.52m, _contaCorrente.Saldo);
+        Assert.Equal(1432.99m, _contaCorrenteDestino.Saldo);
 
-        Assert.Equal(192.48m, _contaCorrente.ObterSaldoDisponivel());
-        Assert.Equal(1732.99m, _contaCorrenteDestino.ObterSaldoDisponivel());
+        Assert.Equal(197.48m, _contaCorrente.SaldoDisponivel);
+        Assert.Equal(1732.99m, _contaCorrenteDestino.SaldoDisponivel);
     }
 }
 

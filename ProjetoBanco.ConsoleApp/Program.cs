@@ -16,10 +16,10 @@ Console.WriteLine(c3.ToString());
 Console.WriteLine(c4.ToString());
 
 // Realizando operações
-c1.Depositar(100m, 1); // 1300
-c2.Depositar(200m, 1); // 1600
-c3.Depositar(300m, 1); // 2300
-c4.Depositar(400m, 1); // 1900
+c1.Depositar(100m); // 1300
+c2.Depositar(200m); // 1600
+c3.Depositar(300m); // 2300
+c4.Depositar(400m); // 1900
 
 c1.Sacar(400m); // 900
 c2.Sacar(300m); // 1300
@@ -72,16 +72,12 @@ foreach (var conta in contas)
 }
 
 // Exibindo extratos individuais
-Console.WriteLine("\n");
 c1.ExibirExtrato();
 
-Console.WriteLine("\n");
 c2.ExibirExtrato();
 
-Console.WriteLine("\n");
 c3.ExibirExtrato();
 
-Console.WriteLine("\n");
 c4.ExibirExtrato();
 
 Console.WriteLine("\n");
