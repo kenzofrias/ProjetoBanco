@@ -69,7 +69,7 @@ namespace ProjetoBanco.Core.Models
             AdicionarMovimentacaoHistorico(new HistoricoResposta(TipoOperacao.TransferenciaEnviada, valor, Saldo + valor, Saldo));
         }
         
-        public IHistoricoResposta AdicionarMovimentacaoHistorico(IHistoricoResposta historicoResposta)
+        protected IHistoricoResposta AdicionarMovimentacaoHistorico(IHistoricoResposta historicoResposta)
         {
             if(historicoResposta == null)
                 throw new HistoricoRespostaException("[ERRO] O histórico de resposta não pode ser nulo.");

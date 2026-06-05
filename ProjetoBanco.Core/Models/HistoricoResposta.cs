@@ -27,7 +27,7 @@ namespace ProjetoBanco.Core.Models
                 TipoOperacao.TransferenciaRecebida => "Transferência Recebida",
                 TipoOperacao.Rendimento => "Rendimento",
                 TipoOperacao.TarifaMensal => "Tarifa Mensal",
-                _ => "Operação Desconcida"
+                _ => "Operação Desconhecida"
             };
             Valor = valor;
             SaldoAnterior = saldoAnterior;

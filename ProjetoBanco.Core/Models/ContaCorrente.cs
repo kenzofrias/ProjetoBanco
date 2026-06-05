@@ -10,12 +10,11 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaCorrente : Conta
     {
-        private decimal _saldoDisponivel => _limiteChequeEspecial + Saldo;
         private decimal _limiteChequeEspecial;
         private decimal _taxaManutencao;
 
         public decimal LimiteChequeEspecial => _limiteChequeEspecial;
-        public decimal SaldoDisponivel => _saldoDisponivel;
+        public decimal SaldoDisponivel => _limiteChequeEspecial + Saldo;
         public decimal TaxaManutencao => _taxaManutencao;
 
         public ContaCorrente() { }
