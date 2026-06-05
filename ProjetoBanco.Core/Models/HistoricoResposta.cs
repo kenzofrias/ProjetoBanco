@@ -15,7 +15,7 @@ namespace ProjetoBanco.Core.Models
         public decimal SaldoAnterior { get; }
         public decimal SaldoAtual { get; }
 
-        public HistoricoResposta(){}
+        public HistoricoResposta(){  }
         public HistoricoResposta(TipoOperacao tipoOperacao, decimal valor, decimal saldoAnterior, decimal saldoAtual)
         {
             Data = DateTime.Now;
