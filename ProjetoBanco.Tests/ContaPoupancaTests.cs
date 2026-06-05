@@ -25,9 +25,9 @@ namespace ProjetoBanco.Tests;
         {
             decimal valorDeposito = 100m;
 
-            _contaPoupanca.Depositar(valorDeposito,1);
+            _contaPoupanca.Depositar(valorDeposito);
 
-            Assert.Equal(1100m, _contaPoupanca.ObterSaldo());
+            Assert.Equal(1100m, _contaPoupanca.Saldo);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace ProjetoBanco.Tests;
             decimal valorDeposito = -100m;
 
             var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Depositar(valorDeposito,1));
+                () => _contaPoupanca.Depositar(valorDeposito));
 
             Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
         }
@@ -47,7 +47,7 @@ namespace ProjetoBanco.Tests;
             decimal valorDeposito = 0m;
 
             var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Depositar(valorDeposito,1));
+                () => _contaPoupanca.Depositar(valorDeposito));
 
             Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
         }
@@ -63,7 +63,7 @@ namespace ProjetoBanco.Tests;
             _contaPoupanca.Sacar(valorSaque);
 
             // Then
-            Assert.Equal(654.78m, _contaPoupanca.ObterSaldo());
+            Assert.Equal(654.78m, _contaPoupanca.Saldo);
         }
 
         [Fact]
@@ -105,9 +105,9 @@ namespace ProjetoBanco.Tests;
             _contaPoupanca.Transferir(_contaCorrente, valorTransferencia);
 
             // Then
-            Assert.Equal(654.78m, _contaPoupanca.ObterSaldo());
-            Assert.Equal(845.22m, _contaCorrente.ObterSaldo());
-            Assert.Equal(1045.22m, _contaCorrente.ObterSaldoDisponivel());
+            Assert.Equal(654.78m, _contaPoupanca.Saldo);
+            Assert.Equal(845.22m, _contaCorrente.Saldo);
+            Assert.Equal(1045.22m, _contaCorrente.SaldoDisponivel);
         }
 
         [Fact]
@@ -122,8 +122,8 @@ namespace ProjetoBanco.Tests;
 
             // Then
             Assert.Equal("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.", ex.Message);
-            Assert.Equal(500m, _contaCorrente.ObterSaldo());
-            Assert.Equal(700m, _contaCorrente.ObterSaldoDisponivel());
+            Assert.Equal(500m, _contaCorrente.Saldo);
+            Assert.Equal(700m, _contaCorrente.SaldoDisponivel);
         }
 
         [Fact]
@@ -138,8 +138,8 @@ namespace ProjetoBanco.Tests;
 
             // Then
             Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.", ex.Message);
-            Assert.Equal(500m, _contaCorrente.ObterSaldo());
-            Assert.Equal(700m, _contaCorrente.ObterSaldoDisponivel());
+            Assert.Equal(500m, _contaCorrente.Saldo);
+            Assert.Equal(700m, _contaCorrente.SaldoDisponivel);
         }
 
         // Testes de aplicação de rendimento
@@ -152,7 +152,7 @@ namespace ProjetoBanco.Tests;
             _contaPoupanca.AplicarRendimento();
 
             // Then
-            Assert.Equal(1050m, _contaPoupanca.ObterSaldo());
+            Assert.Equal(1050m, _contaPoupanca.Saldo);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace ProjetoBanco.Tests;
             }
 
             // Then
-            Assert.Equal(1276.28m, _contaPoupanca.ObterSaldo());
+            Assert.Equal(1276.28m, Math.Round(_contaPoupanca.Saldo,2));
         }
         
         [Fact]
@@ -180,6 +180,6 @@ namespace ProjetoBanco.Tests;
         
             // Then
             Assert.Equal("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.", ex.Message);
-            Assert.Equal(0m, _contaPoupançaZerada.ObterSaldo());
+            Assert.Equal(0m, _contaPoupançaZerada.Saldo);
         }
     }

@@ -72,16 +72,12 @@ foreach (var conta in contas)
 }
 
 // Exibindo extratos individuais
-Console.WriteLine("\n");
 c1.ExibirExtrato();
 
-Console.WriteLine("\n");
 c2.ExibirExtrato();
 
-Console.WriteLine("\n");
 c3.ExibirExtrato();
 
-Console.WriteLine("\n");
 c4.ExibirExtrato();
 
 Console.WriteLine("\n");
