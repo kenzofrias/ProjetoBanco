@@ -16,14 +16,18 @@ A solução é dividida em três projetos principais, seguindo boas práticas de
 ProjetoBanco/
 │
 ├── 📂 ProjetoBanco.Core/
-│   ├── 📂 Models/
-|   |    ├── 📄 Conta.cs
-│   |    ├── 📄 ContaCorrente.cs
-│   |    └── 📄 ContaPoupanca.cs
-│   └── 📂 Exceptions/
-|        ├── 📄 SaldoInsuficienteException.cs
-|        ├── 📄 ValorInsuficienteException.cs
-|        └── 📄 ContaInativaException.cs
+|    └── 📂 Enums/
+|    |    └── 📄 TipoOperacao.cs 
+│    ├── 📂 Models/
+|    |    ├── 📄 Conta.cs
+│    |    ├── 📄 ContaCorrente.cs
+│    |    ├── 📄 ContaPoupanca.cs
+|    |    └── 📄 HistoricoResposta.cs
+│    └── 📂 Exceptions/
+|         ├── 📄 SaldoInsuficienteException.cs
+|         ├── 📄 ValorInsuficienteException.cs
+|         ├── 📄 HistoricoRespostaException.cs
+|         └── 📄 ContaInativaException.cs
 │
 ├── 📂 ProjetoBanco.ConsoleApp/
 │    └── 📄 Program.cs
