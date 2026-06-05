@@ -48,16 +48,16 @@ Abaixo está o diagrama UML que representa a estrutura principal do domínio do 
 classDiagram
     class Conta {
         <<abstract>>
-        #string Numero
-        #string Titular
+        +string Numero
+        +string Titular
         #decimal Saldo
-        #bool Ativa
-        #Stack~string~ Historico
-        +Depositar(decimal valor, int operacao)*
-        +Sacar(decimal valor)*
-        +Transferir(Conta destino, decimal valor)*
-        +ObterSaldo() decimal
-        +ObterSaldoDisponivel() decimal
+        +bool Ativa
+        +IReadOnlyCollection~IHistoricoResposta~ Historico
+        +Depositar(decimal valor)
+        +Sacar(decimal valor)
+        +Transferir(Conta destino, decimal valor)
+        #ReceberTransferencia(decimal valor)
+        #PodeRealizarOperacao(decimal valor) bool
         +ExibirExtrato()
         +ToString() string
         +AplicarRendimento()
@@ -66,20 +66,17 @@ classDiagram
 
     class ContaCorrente {
         -decimal _limiteChequeEspecial
-        -decimal _saldoDisponivel
         -decimal _taxaManutencao
-        -AtualizarSaldoDisponivel(int operacao, decimal valor)
-        +Depositar(decimal valor, int operacao)
-        +Sacar(decimal valor)
-        +Transferir(Conta destino, decimal valor)
+        +decimal SaldoDisponivel
+        #PodeRealizarOperacao(decimal valor) bool
         +CalcularTarifaMensal()
-        +ObterSaldoDisponivel() decimal
         +ToString() string
     }
 
     class ContaPoupanca {
         -decimal _taxaRendimento
         +AplicarRendimento()
+        +ToString() string
     }
 
     class Exception {
@@ -101,30 +98,27 @@ classDiagram
 ## 🧩 Classes e Modelos Principais
 
 ### 1. `Conta` (Classe Base/Abstrata)
-Representa a estrutura fundamental de uma conta bancária. Todas as outras contas herdam desta classe, aproveitando seus métodos e atributos.
-* **Atributos base:** Número da conta, Titular da conta e Saldo atual.
+Representa a estrutura fundamental de uma conta bancária. Todas as outras contas herdam desta classe, possuindo um modelo de **Domínio Rico** (as regras de negócio estão na própria entidade, não em Services).
+* **Encapsulamento Seguro:** O `Saldo` possui `protected set`, impedindo modificações externas diretas.
 * **Métodos base:**
-  * `Depositar(decimal valor)`: Adiciona fundos à conta. Valida ativamente se o valor inserido é estritamente positivo.
-  * `Sacar(decimal valor)`: Retira fundos da conta. As classes filhas determinam se há limite disponível (via polimorfismo).
-  * `Transferir(Conta destino, decimal valor)`: Debita da conta de origem e credita na conta de destino informada.
-  * `ObterSaldo()`: Retorna o saldo real exato da conta.
-  * `ObterSaldoDisponivel()`: Retorna o saldo total de "poder de compra" disponível para o usuário (incluindo o cheque especial, se aplicável).
+  * `Depositar(decimal valor)` e `Sacar(decimal valor)`: Manipulam os fundos validando regras através de *Early Returns* (Cláusulas de Guarda).
+  * `PodeRealizarOperacao(decimal valor)`: Implementa o padrão **Template Method**. A classe base avalia o saldo real, enquanto classes filhas alteram a regra silenciosamente.
+  * `Transferir(Conta destino, decimal valor)`: Orquestra a redução do saldo de origem e chama internamente o método `ReceberTransferencia` na conta de destino.
   * `ExibirExtrato()`: Imprime detalhadamente no console todo o histórico e movimentações da conta.
-  * `ToString()`: Retorna uma representação em texto formatada com os dados essenciais da conta.
 
 ### 2. `ContaCorrente`
 Herda de `Conta`. Representa uma conta padrão para movimentação e uso diário, com suporte a limite de crédito (cheque especial) e taxas de manutenção.
-* **Atributos específicos:** `LimiteChequeEspecial` e tarifa periódica.
+* **Atributos específicos:** `LimiteChequeEspecial`, `SaldoDisponivel` e tarifa periódica.
 * **Comportamento específico:**
-  * Os métodos `Sacar()` e `Transferir()` sobrescrevem o comportamento padrão para permitir que o saldo fique negativo, suportando débitos até o limite estipulado pelo cheque especial do titular.
+  * Sobrescreve apenas a regra `PodeRealizarOperacao(decimal valor)` comparando contra o `SaldoDisponivel` em vez do saldo real, reaproveitando a lógica inteira de saques e transferências da classe base (DRY - Don't Repeat Yourself).
   * `CalcularTarifaMensal()`: Deduz automaticamente a tarifa de manutenção do saldo da conta (no exemplo, o teste aponta um custo mensal que pode, inclusive, deixar a conta negativada).
 
 ### 3. `ContaPoupanca`
 Herda de `Conta`. Ideal para o acúmulo de patrimônio, oferecendo taxa de juros e rendimento sobre o saldo positivo guardado.
 * **Atributos específicos:** `TaxaRendimento` (em valor percentual).
 * **Comportamento específico:**
-  * Diferente da conta corrente, **não possui cheque especial**. Qualquer saque ou transferência superior ao valor real guardado é negado imediatamente.
-  * `AplicarRendimento()`: Calcula o percentual de juros determinado no construtor e o adiciona ao saldo. Apenas é aplicado se o saldo for maior que zero.
+  * Apenas o `Saldo` base é considerado (herança inalterada da validação `PodeRealizarOperacao`).
+  * `AplicarRendimento()`: Calcula o percentual de juros sobre o saldo positivo da conta, validando ativamente possíveis exceções de conta inativa ou saldo zerado.
 
 
 ## 🔄 Fluxo de Transferência (Diagrama de Sequência)
@@ -141,10 +135,10 @@ sequenceDiagram
     activate Origem
     
     alt Validação de Sucesso (Ativa, Valor > 0, Saldo/Limite OK)
-        Origem->>Origem: Deduz valor do Saldo / Saldo Disponível
-        Origem->>Destino: Depositar(valor, operacao: 2)
+        Origem->>Origem: Saldo -= valor
+        Origem->>Destino: ReceberTransferencia(valor)
         activate Destino
-        Destino->>Destino: Adiciona valor ao Saldo / Saldo Disponível
+        Destino->>Destino: Saldo += valor
         Destino->>Destino: Registra no Histórico (Transferência Recebida)
         Destino-->>Origem: Retorno (Sucesso)
         deactivate Destino
@@ -172,8 +166,8 @@ sequenceDiagram
   alt Valor inválido (valor <= 0)
     Conta-->>Cliente: Lança ValorInsuficienteException
   else Saldo e Limite Suficientes
-   Conta->>Conta: Deduz do Saldo Real (pode ficar negativo)
-   Conta->>Conta: Atualiza Saldo Disponível (deduz do limite)
+   Conta->>Conta: Avalia PodeRealizarOperacao(valor)
+   Conta->>Conta: Saldo -= valor
    Conta->>Conta: Registra Saque no Histórico
    Conta-->>Cliente: Operação Concluída
   else Saldo e Limite Insuficientes
@@ -223,14 +217,16 @@ O sistema implementa uma camada de segurança robusta baseada em Exceções cust
 Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reconhecidas na engenharia de software:
 
 * **Programação Orientada a Objetos (POO):** Uso massivo de Herança (`ContaPoupanca` e `ContaCorrente` derivando de `Conta`), Encapsulamento (controle rígido de estado interno) e Polimorfismo (sobrescrita de métodos de saque e rendimento).
+* **Domínio Rico (Rich Domain):** A lógica de negócio pertence aos modelos. O estado (`Saldo`) tem a alteração blindada (`protected set`) e somente os próprios objetos são responsáveis por se manipular.
 * **Tratamento de Exceções de Domínio:** Adoção de arquitetura resiliente substituindo retornos booleanos tradicionais por exceções de domínio semanticamente ricas (`SaldoInsuficienteException`, `ValorInsuficienteException`, `ContaInativaException`).
+* **Template Method Pattern:** Extração da lógica polimórfica para métodos minúsculos (`PodeRealizarOperacao`), eliminando brutalmente a duplicação de código de validação entre conta corrente e poupança.
 * **Testes Unitários Bem Estruturados:** Construção de testes utilizando as convenções **AAA** (Arrange, Act, Assert) estruturadas via comentários **Given, When, Then**, cobrindo o caminho feliz e casos extremos para proteger a aplicação de regressões.
-* **Clean Code:** Código limpo e autoexplicativo com nomenclatura clara em português, divisão de responsabilidades claras (camadas de _Models_ e _Exceptions_) e métodos objetivos.
+* **Clean Code e Early Return:** Código legível em português, sem a pirâmide de *if/else*. Cláusulas de guarda validadas diretamente no início dos métodos aumentam a clareza.
 
 
 ## ✅ Testes Unitários
 
-O projeto foi construído focando em qualidade, contando com extensivos testes automatizados na pasta `ProjetoBanco.Core.Tests`. Estão cobertos cenários como:
+O projeto foi construído focando em qualidade, contando com extensivos testes automatizados na pasta `ProjetoBanco.Tests`. Estão cobertos cenários como:
 * **Depósitos:** Acúmulo progressivo de saldo, rejeição rigorosa de valores negativos e zeros.
 * **Saques:** Atualização correta do *saldo real* vs *saldo disponível*. Testes validando o bloqueio de saques fora de limites ou saques que usam parte do limite especial.
 * **Transferências:** Débito atômico na origem e crédito correto e sincronizado no destino.
