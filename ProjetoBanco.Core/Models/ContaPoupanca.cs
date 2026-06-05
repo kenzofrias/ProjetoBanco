@@ -19,20 +19,12 @@ namespace ProjetoBanco.Core.Models
 
         public override void AplicarRendimento()
         {
-            if (Ativa && Saldo > 0)
-            {
-                decimal rendimento = Saldo * TaxaRendimento;
-                AumentarSaldo(rendimento);
-                AdicionarMovimentacaoHistorico(new HistoricoResposta(TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
-            }
-            else if (Ativa && Saldo <= 0)
-            {
-                throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.");
-            }
-            else
-            {
-                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível aplicar rendimento.");
-            }
+            if (!Ativa) throw new ContaInativaException("[ERRO] Conta inativa. Não é possível aplicar rendimento.");
+            if (Saldo <= 0) throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.");
+
+            decimal rendimento = Saldo * TaxaRendimento;
+            Saldo += rendimento;
+            AdicionarMovimentacaoHistorico(new HistoricoResposta(TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
         }
 
         public override string ToString() => $"Titular: {Titular} | Saldo: {Saldo:C}";
