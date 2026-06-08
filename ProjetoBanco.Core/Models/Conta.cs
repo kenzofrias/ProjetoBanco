@@ -12,9 +12,9 @@ namespace ProjetoBanco.Core.Models
     {
         private readonly Stack<IHistoricoResposta> _historico;
 
-        public string Numero { get; } = string.Empty;
-        public string Titular { get; } = string.Empty;
-        public bool Ativa { get; } = false;
+        public string Numero { get; protected set; } = string.Empty;
+        public string Titular { get; protected set; } = string.Empty;
+        public bool Ativa { get; protected set; } = false;
         public decimal Saldo { get; protected set; }
         public IReadOnlyCollection<IHistoricoResposta> Historico => _historico;
 

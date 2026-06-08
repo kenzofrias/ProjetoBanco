@@ -10,18 +10,15 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaCorrente : Conta
     {
-        private decimal _limiteChequeEspecial;
-        private decimal _taxaManutencao;
-
-        public decimal LimiteChequeEspecial => _limiteChequeEspecial;
-        public decimal SaldoDisponivel => _limiteChequeEspecial + Saldo;
-        public decimal TaxaManutencao => _taxaManutencao;
+        public decimal LimiteChequeEspecial { get; protected set; }
+        public decimal SaldoDisponivel => LimiteChequeEspecial + Saldo;
+        public decimal TaxaManutencao { get; protected set; }
 
         public ContaCorrente() { }
         public ContaCorrente(string numero, string titular, decimal saldo, decimal limiteChequeEspecial) : base(numero, titular, saldo)
         {
-            _limiteChequeEspecial = limiteChequeEspecial;
-            _taxaManutencao = 20.00m;
+            LimiteChequeEspecial = limiteChequeEspecial;
+            TaxaManutencao = 20.00m;
         }
 
         protected override bool PodeRealizarOperacao(decimal valor) => SaldoDisponivel >= valor;

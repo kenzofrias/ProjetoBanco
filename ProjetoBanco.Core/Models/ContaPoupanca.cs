@@ -10,11 +10,11 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaPoupanca : Conta
     {
-        private decimal _taxaRendimento;
-        public decimal TaxaRendimento => _taxaRendimento;
+        public decimal TaxaRendimento { get; protected set; }
+        
         public ContaPoupanca(string numero, string titular, decimal saldo, decimal taxaRendimento) : base(numero, titular, saldo)
         {
-            _taxaRendimento = taxaRendimento / 100; // Convertendo a taxa de rendimento de percentual para decimal
+            TaxaRendimento = taxaRendimento / 100; // Convertendo a taxa de rendimento de percentual para decimal
         }
 
         public override void AplicarRendimento()
