@@ -9,6 +9,7 @@ namespace ProjetoBanco.Infrastructure.Data
 {
     public class BancoDBContext : DbContext
     {
+        public DbSet<Conta> Contas { get; set; }
         public DbSet<ContaCorrente> ContasCorrentes { get; set; }
         public DbSet<ContaPoupanca> ContasPoupancas { get; set; }
 
