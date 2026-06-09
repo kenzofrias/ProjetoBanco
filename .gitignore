@@ -10,5 +10,8 @@ ProjetoBanco.Tests/bin
 ProjetoBanco.Infrastructure/obj
 ProjetoBanco.Infrastructure/bin
 
+ProjetoBanco.Application/bin
+ProjetoBanco.Application/obj
+
 DetalhamentoProjeto.tldr
 Propostas.txt
