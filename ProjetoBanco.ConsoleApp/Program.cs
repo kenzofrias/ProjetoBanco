@@ -20,24 +20,37 @@ async Task<Conta> ObterOuCriarContaAsync(Conta novaConta)
     }
 }
 
-Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("24680", "João S Silva", 1450m, 500m));
+//Contas Corrente
+Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("12345", "João C O Silva", 1200m, 500m));
 Conta c2 = await ObterOuCriarContaAsync(new ContaCorrente("54321", "Maria S O Silva", 1400m, 750m));
-// c1.Depositar(1221m); // 2671
-// c1.Sacar(1354.22m); // 1316.78
-// c1.Transferir(c2, 1550m); // - 233.22 e 1250
-c1.CalcularTarifaMensal(); // -253.22
+
+// Contas Poupança
+Conta c3 = await ObterOuCriarContaAsync(new ContaPoupanca("67890", "Carlos A O Silva", 2000m, 5m));
+Conta c4 = await ObterOuCriarContaAsync(new ContaPoupanca("09876", "Ana C O Silva", 1500m, 3m));
+
+c1.Depositar(1000m);
+c2.Depositar(1000m);
+c3.Depositar(1000m);
+c4.Depositar(1000m);
+
+c1.Transferir(c3, 500m);
+c2.Transferir(c4, 500m);
+
 await repositorio.AtualizarContaAsync(c1);
 await repositorio.AtualizarContaAsync(c2);
+await repositorio.AtualizarContaAsync(c3);
+await repositorio.AtualizarContaAsync(c4);
 
-Console.WriteLine("--- Finalizando a Aplicação ---");
+// Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("24680", "João S Silva", 1450m, 500m));
+// // c1.Depositar(1221m); // 2671
+// // c1.Sacar(1354.22m); // 1316.78
+// // c1.Transferir(c2, 1550m); // - 233.22 e 1250
+// c1.CalcularTarifaMensal(); // -253.22
+// await repositorio.AtualizarContaAsync(c1);
+// await repositorio.AtualizarContaAsync(c2);
+// Console.WriteLine("--- Finalizando a Aplicação ---");
 
 
-// // Contas Corrente
-// Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("12345", "João C O Silva", 1200m, 500m));
-
-// // Contas Poupança
-// Conta c3 = await ObterOuCriarContaAsync(new ContaPoupanca("67890", "Carlos A O Silva", 2000m, 5m));
-// Conta c4 = await ObterOuCriarContaAsync(new ContaPoupanca("09876", "Ana C O Silva", 1500m, 3m));
 
 // // Mostrando titulares e saldos
 // Console.WriteLine("Titulares e Saldos Iniciais:");
