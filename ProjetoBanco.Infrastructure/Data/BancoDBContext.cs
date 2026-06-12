@@ -12,6 +12,7 @@ namespace ProjetoBanco.Infrastructure.Data
         public DbSet<Conta> Contas { get; set; }
         public DbSet<ContaCorrente> ContasCorrentes { get; set; }
         public DbSet<ContaPoupanca> ContasPoupancas { get; set; }
+        public DbSet<HistoricoResposta> Historicos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -40,7 +41,16 @@ namespace ProjetoBanco.Infrastructure.Data
             
             modelBuilder.Entity<ContaPoupanca>().Property(c => c.TaxaRendimento).HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<Conta>().Ignore(c => c.Historico);
+            modelBuilder.Entity<HistoricoResposta>().HasKey(h => h.Id);
+            modelBuilder.Entity<HistoricoResposta>().Property(h => h.Valor).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<HistoricoResposta>().Property(h => h.SaldoAnterior).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<HistoricoResposta>().Property(h => h.SaldoAtual).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Conta>()
+                .HasMany(c => c.Historico)
+                .WithOne()
+                .HasForeignKey(h => h.NumeroConta)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Conta>()
                 .HasDiscriminator<string>("TipoConta")

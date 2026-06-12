@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoBanco.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using ProjetoBanco.Infrastructure.Data;
 namespace ProjetoBanco.Infrastructure.Migrations
 {
     [DbContext(typeof(BancoDBContext))]
-    partial class BancoDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260612150131_CriandoTabelaHistorico")]
+    partial class CriandoTabelaHistorico
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

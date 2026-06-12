@@ -9,15 +9,18 @@ namespace ProjetoBanco.Core.Models
 {
     public class HistoricoResposta : IHistoricoResposta
     {
-        public DateTime Data { get; }
-        public string Operacao { get; }
-        public decimal Valor { get; }
-        public decimal SaldoAnterior { get; }
-        public decimal SaldoAtual { get; }
+        public int Id { get; protected set; }
+        public string NumeroConta { get; protected set; } = string.Empty;
+        public DateTime Data { get; protected set; }
+        public string Operacao { get; protected set; }
+        public decimal Valor { get; protected set; }
+        public decimal SaldoAnterior { get; protected set; }
+        public decimal SaldoAtual { get; protected set; }
 
         public HistoricoResposta(){  }
-        public HistoricoResposta(TipoOperacao tipoOperacao, decimal valor, decimal saldoAnterior, decimal saldoAtual)
+        public HistoricoResposta(string numeroConta, TipoOperacao tipoOperacao, decimal valor, decimal saldoAnterior, decimal saldoAtual)
         {
+            NumeroConta = numeroConta;
             Data = DateTime.Now;
             Operacao = tipoOperacao switch
             {
@@ -36,7 +39,9 @@ namespace ProjetoBanco.Core.Models
 
         public override string ToString()
         {
-            return $"{Data:dd/MM/yyyy} - {Operacao}: {((Operacao == "Saque" || Operacao == "Transferência Enviada" || Operacao == "Tarifa Mensal") ? "-" : "+")}{Valor:C} | Saldo anterior: {SaldoAnterior:C} | Saldo atual: {SaldoAtual:C}";
+            // Compara de forma matemática se o saldo reduziu para definir o sinal de exibição dinamicamente
+            string sinal = SaldoAtual < SaldoAnterior ? "-" : "+";
+            return $"{Data:dd/MM/yyyy} - {Operacao}: {sinal}{Valor:C} | Saldo anterior: {SaldoAnterior:C} | Saldo atual: {SaldoAtual:C}";
         }
     }
-} 
+}
