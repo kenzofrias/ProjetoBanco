@@ -11,7 +11,7 @@ namespace ProjetoBanco.Tests;
     public class ContaPoupancaTests
     {
         private ContaPoupanca _contaPoupanca = new ContaPoupanca("12345", "João C O Silva", 1000m, 5m);
-        private ContaPoupanca _contaPoupançaZerada = new ContaPoupanca("67890", "Ana M R Oliveira", 0m, 5m);
+        private ContaPoupanca _contaPoupancaZerada = new ContaPoupanca("67890", "Ana M R Oliveira", 0m, 5m);
         private ContaCorrente _contaCorrente = new ContaCorrente("54321", "Maria A B Souza", 500m, 200m);
 
         public ContaPoupancaTests()
@@ -169,17 +169,17 @@ namespace ProjetoBanco.Tests;
             }
 
             // Then
-            Assert.Equal(1276.28m, Math.Round(_contaPoupanca.Saldo,2));
+            Assert.Equal(1276.28m, _contaPoupanca.Saldo, 2);
         }
         
         [Fact]
         public void DeveAplicarRendimentoUmaVezERetornarExcecao()
         {
             // When
-            var ex = Assert.Throws<SaldoInsuficienteException>(() => _contaPoupançaZerada.AplicarRendimento());
+            var ex = Assert.Throws<SaldoInsuficienteException>(() => _contaPoupancaZerada.AplicarRendimento());
         
             // Then
             Assert.Equal("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.", ex.Message);
-            Assert.Equal(0m, _contaPoupançaZerada.Saldo);
+            Assert.Equal(0m, _contaPoupancaZerada.Saldo);
         }
     }
