@@ -38,10 +38,7 @@ namespace ProjetoBanco.Infrastructure.Repositories
                 throw new KeyNotFoundException($"[ERRO] A conta de número {conta.Numero} não foi encontrada para atualização.");
             }
             
-            _context.Contas.Attach(conta);
-            
-            // Informa ao EF Core que APENAS a propriedade Saldo sofreu alteração
-            _context.Entry(conta).Property(c => c.Saldo).IsModified = true;
+            _context.Contas.Update(conta);
             
             await _context.SaveChangesAsync();
         }
@@ -49,7 +46,9 @@ namespace ProjetoBanco.Infrastructure.Repositories
         public async Task<Conta?> ObterContaPorNumeroAsync(string numero)
         {
             // Realiza apenas 1 viagem ao banco de dados.
-            var conta = await _context.Contas.FirstOrDefaultAsync(c => c.Numero == numero);
+            var conta = await _context.Contas
+                .Include(c => c.Historico)
+                .FirstOrDefaultAsync(c => c.Numero == numero);
             
             if (conta == null)
             {

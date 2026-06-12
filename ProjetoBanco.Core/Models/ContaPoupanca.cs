@@ -24,7 +24,7 @@ namespace ProjetoBanco.Core.Models
 
             decimal rendimento = Saldo * TaxaRendimento;
             Saldo += rendimento;
-            AdicionarMovimentacaoHistorico(new HistoricoResposta(TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
+            AdicionarMovimentacaoHistorico(new HistoricoResposta(Numero, TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
         }
 
         public override string ToString() => $"Titular: {Titular} | Saldo: {Saldo:C}";
