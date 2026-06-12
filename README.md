@@ -6,6 +6,8 @@ Um sistema bancário completo e robusto desenvolvido em C# utilizando os princí
 
 * **C#** (Linguagem de programação principal)
 * **.NET SDK** (Plataforma e ecossistema de desenvolvimento)
+* **Entity Framework Core** (ORM utilizado para persistência em banco de dados)
+* **SQL Server** (Banco de dados relacional para armazenamento das contas e históricos)
 * **xUnit** (Framework utilizado para a criação dos testes unitários)
 
 ## 🗂️ Estrutura do Projeto
@@ -18,6 +20,9 @@ ProjetoBanco/
 ├── 📂 ProjetoBanco.Core/
 |    └── 📂 Enums/
 |    |    └── 📄 TipoOperacao.cs 
+|    ├── 📂 Interfaces/
+|    |    ├── 📄 IConta.cs
+|    |    └── 📄 IHistoricoResposta.cs
 │    ├── 📂 Models/
 |    |    ├── 📄 Conta.cs
 │    |    ├── 📄 ContaCorrente.cs
@@ -28,6 +33,12 @@ ProjetoBanco/
 |         ├── 📄 ValorInsuficienteException.cs
 |         ├── 📄 HistoricoRespostaException.cs
 |         └── 📄 ContaInativaException.cs
+│
+├── 📂 ProjetoBanco.Infrastructure/
+|    ├── 📂 Data/
+|    |    └── 📄 BancoDBContext.cs
+|    └── 📂 Repositories/
+|         └── 📄 ContaRepositorio.cs
 │
 ├── 📂 ProjetoBanco.ConsoleApp/
 │    └── 📄 Program.cs
@@ -41,23 +52,36 @@ ProjetoBanco/
   * `Enums/`: Contém as enumerações utilizadas pelo sistema (`TipoOperacao`) para classificar as movimentações.
   * `Models/`: Contém as entidades centrais do sistema (`Conta`, `ContaCorrente`, `ContaPoupanca`).
   * `Exceptions/`: Contém as exceções personalizadas para o controle de domínio (`SaldoInsuficienteException`, `ValorInsuficienteException`, `ContaInativaException`, `HistoricoRespostaException`).
+  * `Interfaces/`: Contém os contratos do sistema, como `IConta` e `IHistoricoResposta`.
+* **`ProjetoBanco.Infrastructure/`**: Camada responsável pela persistência de dados, isolando o ORM do domínio.
+  * `Data/`: Configuração principal do **Entity Framework Core** através do `BancoDBContext`, que gerencia as tabelas e heranças no banco de dados.
+  * `Repositories/`: Implementações baseadas no Repository Pattern (como o `ContaRepositorio`) para centralizar as operações de CRUD.
 * **`ProjetoBanco.ConsoleApp/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
 * **`ProjetoBanco.Tests/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
 
 
-## 📊 Diagrama de Classes (UML)
+## 🗄️ Persistência de Dados e ORM
+
+A infraestrutura utiliza o **Entity Framework Core (EF Core)** interligado ao **SQL Server**, garantindo a persistência do estado do sistema através de boas práticas:
+* **Table-Per-Hierarchy (TPH):** O Contexto de Banco de Dados está configurado para salvar as entidades em TPH. Ambas as classes `ContaCorrente` e `ContaPoupanca` habitam a mesma tabela, separadas por uma coluna discriminadora chamada `TipoConta`.
+* **Repository Pattern:** Consultas e manipulações no banco são centralizadas via `ContaRepositorio`, utilizando chamadas totalmente assíncronas (`async/await`) em benefício da performance e da organização do código.
+* **Mapeamento em Cascata:** A relação de `Conta` possuindo muitos `HistoricoResposta` (1:N) foi definida explicitamente através da `Fluent API` para deleção em cascata e configuração restrita dos atributos no banco (ex: `HasColumnType("decimal(18,2)")`).
+
+##  Diagrama de Classes (UML)
 
 Abaixo está o diagrama UML que representa a estrutura principal do domínio do projeto:
 
 ```mermaid
 classDiagram
+    class IConta { <<interface>> }
+
     class Conta {
         <<abstract>>
         +string Numero
         +string Titular
         #decimal Saldo
         +bool Ativa
-        +IReadOnlyCollection~IHistoricoResposta~ Historico
+        +IReadOnlyCollection~HistoricoResposta~ Historico
         +Depositar(decimal valor)
         +Sacar(decimal valor)
         +Transferir(Conta destino, decimal valor)
@@ -84,6 +108,16 @@ classDiagram
         +ToString() string
     }
 
+    class IHistoricoResposta { <<interface>> }
+
+    class HistoricoResposta {
+        +DateTime Data
+        +string Operacao
+        +decimal Valor
+        +decimal SaldoAnterior
+        +decimal SaldoAtual
+    }
+
     class Exception {
         <<System>>
     }
@@ -92,8 +126,12 @@ classDiagram
     class ValorInsuficienteException
     class ContaInativaException
 
+    IConta <|.. Conta
     Conta <|-- ContaCorrente
     Conta <|-- ContaPoupanca
+
+    IHistoricoResposta <|.. HistoricoResposta
+    Conta "1" *-- "N" HistoricoResposta
     
     Exception <|-- SaldoInsuficienteException
     Exception <|-- ValorInsuficienteException
@@ -228,6 +266,8 @@ Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reco
 * **Template Method Pattern:** Extração da lógica polimórfica para métodos minúsculos (`PodeRealizarOperacao`), eliminando brutalmente a duplicação de código de validação entre conta corrente e poupança.
 * **Testes Unitários Bem Estruturados:** Construção de testes utilizando as convenções **AAA** (Arrange, Act, Assert) estruturadas via comentários **Given, When, Then**, cobrindo o caminho feliz e casos extremos para proteger a aplicação de regressões.
 * **Clean Code e Early Return:** Código legível em português, sem a pirâmide de *if/else*. Cláusulas de guarda validadas diretamente no início dos métodos aumentam a clareza.
+* **Programação Assíncrona (Async/Await):** Comunicações de I/O na camada de infraestrutura (Entity Framework Core) feitas de forma assíncrona, não travando a execução da Thread primária.
+* **Padrão Repository & Entity Framework:** O uso de DbContext encapsulado dentro de repositórios oculta a complexidade das queries do código de consumo, promovendo flexibilidade.
 
 
 ## ✅ Testes Unitários
@@ -243,19 +283,29 @@ O projeto foi construído focando em qualidade, contando com extensivos testes a
 
 ### Pré-requisitos
 * **.NET SDK** (Recomendado 6.0 ou superior) instalado em sua máquina.
+* **SQL Server** rodando localmente (via instalador ou Docker) ou remoto.
 
 ### Passo a Passo
 
 1. Clone o repositório ou baixe o código fonte.
 2. Abra o terminal na pasta raiz do projeto.
-3. **Para ver o programa funcionando na prática (Console):**
+3. **Configure as Variáveis de Ambiente:** O sistema aguarda a configuração da conexão do banco de dados na variável `CONNECTION_STRING`.
+   * Em ambiente Windows (CMD):
+     ```bash
+     set CONNECTION_STRING=Server=SEU_SERVIDOR;Database=BancoDB;Trusted_Connection=True;TrustServerCertificate=True;
+     ```
+   * Em ambiente PowerShell:
+     ```powershell
+     $env:CONNECTION_STRING="Server=SEU_SERVIDOR;Database=BancoDB;Trusted_Connection=True;TrustServerCertificate=True;"
+     ```
+4. **Para ver o programa funcionando na prática (Console):**
    ```bash
    cd ProjetoBanco.ConsoleApp
    dotnet run
    ```
    *O console exibirá criações de contas, transferências sendo feitas, o impacto do cheque especial e a listagem dos extratos finais.*
 
-4. **Para rodar a bateria de testes automatizados e validar o código:**
+5. **Para rodar a bateria de testes automatizados e validar o código:**
    ```bash
    cd ProjetoBanco.Tests
    dotnet test
@@ -268,6 +318,7 @@ O projeto foi construído focando em qualidade, contando com extensivos testes a
 
 Este projeto foi desenvolvido com foco em consolidar conhecimentos em:
 - **Programação Orientada a Objetos (POO):** Abstração, herança e polimorfismo.
+- **Persistência de Dados e ORM:** Configuração avançada de Entity Framework Core via Fluent API.
 - **Modelagem de Domínio:** Tradução de regras de negócio reais para código (limites, tarifas, rendimentos).
 - **Qualidade de Software:** Criação de testes unitários automatizados utilizando o framework xUnit.
 - **Resiliência:** Tratamento robusto de erros criando exceções customizadas da aplicação.
