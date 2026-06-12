@@ -10,18 +10,15 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaCorrente : Conta
     {
-        private decimal _limiteChequeEspecial;
-        private decimal _taxaManutencao;
-
-        public decimal LimiteChequeEspecial => _limiteChequeEspecial;
-        public decimal SaldoDisponivel => _limiteChequeEspecial + Saldo;
-        public decimal TaxaManutencao => _taxaManutencao;
+        public decimal LimiteChequeEspecial { get; protected set; }
+        public decimal SaldoDisponivel => LimiteChequeEspecial + Saldo;
+        public decimal TaxaManutencao { get; protected set; }
 
         public ContaCorrente() { }
-        public ContaCorrente(string numero, string titular, decimal saldo, decimal limiteChequeEspecial) : base(numero, titular, saldo)
+        public ContaCorrente(string numero, string titular, decimal saldo, decimal limiteChequeEspecial, decimal taxaManutencao = 20.00m) : base(numero, titular, saldo)
         {
-            _limiteChequeEspecial = limiteChequeEspecial;
-            _taxaManutencao = 20.00m;
+            LimiteChequeEspecial = limiteChequeEspecial;
+            TaxaManutencao = taxaManutencao;
         }
 
         protected override bool PodeRealizarOperacao(decimal valor) => SaldoDisponivel >= valor;
@@ -32,7 +29,7 @@ namespace ProjetoBanco.Core.Models
             if (!PodeRealizarOperacao(TaxaManutencao)) throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente. Não é possível calcular a tarifa mensal.");
 
             Saldo -= TaxaManutencao;
-            AdicionarMovimentacaoHistorico(new HistoricoResposta(TipoOperacao.TarifaMensal, TaxaManutencao, Saldo + TaxaManutencao, Saldo));
+            AdicionarMovimentacaoHistorico(new HistoricoResposta(Numero, TipoOperacao.TarifaMensal, TaxaManutencao, Saldo + TaxaManutencao, Saldo));
         }
 
         public override string ToString() => $"Titular: {Titular} | Saldo: {Saldo:C} | Saldo Disponível (Cheque Especial): {SaldoDisponivel:C}";

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjetoBanco.Core\ProjetoBanco.Core.csproj" />
+    <ProjectReference Include="..\ProjetoBanco.Infrastructure\ProjetoBanco.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

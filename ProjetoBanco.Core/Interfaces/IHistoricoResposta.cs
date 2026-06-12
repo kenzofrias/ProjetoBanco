@@ -7,6 +7,8 @@ namespace ProjetoBanco.Core.Interfaces
 {
     public interface IHistoricoResposta
     {
+        int Id { get; }
+        string NumeroConta { get; }
         DateTime Data { get; }
         string Operacao { get; }
         decimal Valor { get; }

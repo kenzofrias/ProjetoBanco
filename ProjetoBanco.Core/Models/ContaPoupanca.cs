@@ -10,11 +10,11 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaPoupanca : Conta
     {
-        private decimal _taxaRendimento;
-        public decimal TaxaRendimento => _taxaRendimento;
+        public decimal TaxaRendimento { get; protected set; }
+        
         public ContaPoupanca(string numero, string titular, decimal saldo, decimal taxaRendimento) : base(numero, titular, saldo)
         {
-            _taxaRendimento = taxaRendimento / 100; // Convertendo a taxa de rendimento de percentual para decimal
+            TaxaRendimento = taxaRendimento / 100; // Convertendo a taxa de rendimento de percentual para decimal
         }
 
         public override void AplicarRendimento()
@@ -24,7 +24,7 @@ namespace ProjetoBanco.Core.Models
 
             decimal rendimento = Saldo * TaxaRendimento;
             Saldo += rendimento;
-            AdicionarMovimentacaoHistorico(new HistoricoResposta(TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
+            AdicionarMovimentacaoHistorico(new HistoricoResposta(Numero, TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
         }
 
         public override string ToString() => $"Titular: {Titular} | Saldo: {Saldo:C}";
