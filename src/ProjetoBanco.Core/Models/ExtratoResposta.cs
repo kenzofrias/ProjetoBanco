@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using ProjetoBanco.Core.Enums;
 using ProjetoBanco.Core.Interfaces;
+using ProjetoBanco.Core.ValueObjects;
 
 namespace ProjetoBanco.Core.Models
 {
-    public class HistoricoResposta : IHistoricoResposta
+    public class ExtratoResposta : IExtratoResposta
     {
         public int Id { get; protected set; }
         public string NumeroConta { get; protected set; } = string.Empty;
@@ -17,12 +18,12 @@ namespace ProjetoBanco.Core.Models
         public decimal SaldoAnterior { get; protected set; }
         public decimal SaldoAtual { get; protected set; }
 
-        public HistoricoResposta(){  }
-        public HistoricoResposta(string numeroConta, TipoOperacao tipoOperacao, decimal valor, decimal saldoAnterior, decimal saldoAtual)
+        public ExtratoResposta(){  }
+        public ExtratoResposta(string numeroConta, UltimaMovimentacao ultimaMovimentacao, decimal saldoAnterior, decimal saldoAtual)
         {
             NumeroConta = numeroConta;
-            Data = DateTime.Now;
-            Operacao = tipoOperacao switch
+            Data = ultimaMovimentacao.DataMovimentacao;
+            Operacao = ultimaMovimentacao.TipoOperacao switch
             {
                 TipoOperacao.Deposito => "Depósito",
                 TipoOperacao.Saque => "Saque",
@@ -32,7 +33,7 @@ namespace ProjetoBanco.Core.Models
                 TipoOperacao.TarifaMensal => "Tarifa Mensal",
                 _ => "Operação Desconhecida"
             };
-            Valor = valor;
+            Valor = ultimaMovimentacao.ValorOperacao;
             SaldoAnterior = saldoAnterior;
             SaldoAtual = saldoAtual;
         }
