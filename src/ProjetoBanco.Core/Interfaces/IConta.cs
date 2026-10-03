@@ -2,16 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ProjetoBanco.Core.Enums;
 using ProjetoBanco.Core.Models;
+using ProjetoBanco.Core.ValueObjects;
 
 namespace ProjetoBanco.Core.Interfaces
 {
     public interface IConta
     {
-        string Numero { get; }
-        string Titular { get; }
+        ContaId Id { get; } // Chave primária futura
+        string NumeroConta { get; }
+        string Agencia { get; }
+        TipoConta TipoConta { get; }
+        Status Status { get; }
         decimal Saldo { get; }
-        bool Ativa { get; }
-        IReadOnlyCollection<HistoricoResposta> Historico { get; }  
+        decimal LimiteEspecial { get; }
+        DateTime DataAbertura { get; }
+        UltimaMovimentacao? UltimaMovimentacao { get; }
     }
 }

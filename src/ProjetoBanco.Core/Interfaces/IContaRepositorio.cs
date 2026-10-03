@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ProjetoBanco.Core.Models;
+using ProjetoBanco.Core.ValueObjects;
 
 namespace ProjetoBanco.Core.Interfaces
 {
     public interface IContaRepositorio
     {
-        Task<Conta?> ObterContaPorNumeroAsync(string numero);
+        Task<bool> ContaExisteAsync(ContaId contaId);
+        Task<Conta?> ObterContaPorIdAsync(ContaId contaId);
         Task<IEnumerable<Conta?>> ObterTodasContasAsync();
         Task<IEnumerable<Conta?>> ObterTodasContasCorrenteAsync();
         Task<IEnumerable<Conta?>> ObterTodasContasPoupançaAsync();

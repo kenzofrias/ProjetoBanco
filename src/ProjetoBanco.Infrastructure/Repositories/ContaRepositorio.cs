@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProjetoBanco.Core.Interfaces;
 using ProjetoBanco.Core.Models;
+using ProjetoBanco.Core.ValueObjects;
 using ProjetoBanco.Infrastructure.Data;
 
 namespace ProjetoBanco.Infrastructure.Repositories
@@ -15,6 +16,11 @@ namespace ProjetoBanco.Infrastructure.Repositories
         public ContaRepositorio(BancoDBContext context)
         {
             _context = context;
+        }
+
+        public async Task<bool> ContaExisteAsync(ContaId contaId)
+        {
+            return await _context.Contas.AnyAsync(c => c.Id == contaId);
         }
 
         public async Task AdicionarContaAsync(Conta conta)
@@ -42,12 +48,12 @@ namespace ProjetoBanco.Infrastructure.Repositories
             // A responsabilidade de salvar foi movida para a camada de serviço/aplicação.
         }
 
-        public async Task<Conta?> ObterContaPorNumeroAsync(string numero)
+        public async Task<Conta?> ObterContaPorIdAsync(ContaId contaId)
         {
             // Realiza apenas 1 viagem ao banco de dados.
             var conta = await _context.Contas
                 .Include(c => c.Historico)
-                .FirstOrDefaultAsync(c => c.Numero == numero);
+                .FirstOrDefaultAsync(c => c.Id == contaId);
 
             return conta;
         }
