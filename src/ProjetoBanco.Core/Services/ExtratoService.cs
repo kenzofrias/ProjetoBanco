@@ -40,7 +40,7 @@ public class ExtratoService : IExtratoService
 
         var sb = new StringBuilder();
         string tipoConta = conta.GetType().Name == "ContaPoupanca" ? "Conta Poupança" : "Conta Corrente";
-        
+
         sb.AppendLine($"\n=== Extrato de {tipoConta} ===");
         sb.AppendLine(conta.ToString());
         sb.AppendLine("- Movimentações:");
@@ -58,7 +58,19 @@ public class ExtratoService : IExtratoService
             }
         }
         sb.AppendLine("=======================================");
-        
+
         return sb.ToString();
+    }
+    
+    public async Task<string> ExibirExtrato(ContaId contaId)
+    {
+        bool contaExiste = await _contaRepositorio.ContaExisteAsync(contaId);
+        if (!contaExiste)
+        {
+            throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");
+        }
+
+        var conta = await _contaRepositorio.ObterContaPorIdAsync(contaId);
+        return await GerarExtrato(contaId);
     }
 }

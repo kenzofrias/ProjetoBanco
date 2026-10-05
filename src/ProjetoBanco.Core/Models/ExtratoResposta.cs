@@ -42,6 +42,7 @@ namespace ProjetoBanco.Core.Models
         {
             // Compara de forma matemática se o saldo reduziu para definir o sinal de exibição dinamicamente
             string sinal = SaldoAtual < SaldoAnterior ? "-" : "+";
+            
             return $"{Data:dd/MM/yyyy} - {Operacao}: {sinal}{Valor:C} | Saldo anterior: {SaldoAnterior:C} | Saldo atual: {SaldoAtual:C}";
         }
     }
