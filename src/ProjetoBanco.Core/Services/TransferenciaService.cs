@@ -1,4 +1,5 @@
 using System;
+using ProjetoBanco.Core.Enums;
 using ProjetoBanco.Core.Interfaces;
 using ProjetoBanco.Core.ValueObjects;
 
@@ -34,7 +35,7 @@ public class TransferenciaService : ITransferenciaService
         if (origem == null)
             throw new Exception("[ERRO] A conta de origem não foi encontrada.");
 
-        origem.Sacar(valor);
+        origem.SacarETransferir(valor, TipoOperacao.TransferenciaEnviada);
     }
     
     public async Task ReceberTransferencia(Conta contaDestino, decimal valor)
@@ -42,6 +43,6 @@ public class TransferenciaService : ITransferenciaService
         if (contaDestino == null)
             throw new Exception("[ERRO] A conta de destino não foi encontrada.");
 
-        contaDestino.Depositar(valor);
+        contaDestino.DepositarEReceber(valor, TipoOperacao.TransferenciaRecebida);
     }
 }
