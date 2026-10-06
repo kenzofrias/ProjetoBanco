@@ -16,6 +16,6 @@ namespace ProjetoBanco.Core.Interfaces
         Task<IEnumerable<Conta?>> ObterTodasContasPoupançaAsync();
         Task AdicionarContaAsync(Conta conta);
         Task AtualizarContaAsync(Conta conta);
-        Task RemoverContaAsync(string numeroConta);
+        Task RemoverContaAsync(ContaId contaId);
     }
 }

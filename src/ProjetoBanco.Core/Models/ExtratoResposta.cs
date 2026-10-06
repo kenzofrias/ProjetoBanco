@@ -10,17 +10,20 @@ namespace ProjetoBanco.Core.Models
 {
     public class ExtratoResposta : IExtratoResposta
     {
-        public int Id { get; protected set; }
+        public ExtratoId Id { get; protected set; } = null!;
+        public ContaId ContaId { get; protected set; } = null!;
         public string NumeroConta { get; protected set; } = string.Empty;
         public DateTime Data { get; protected set; }
-        public string Operacao { get; protected set; }
+        public string Operacao { get; protected set; } = string.Empty;
         public decimal Valor { get; protected set; }
         public decimal SaldoAnterior { get; protected set; }
         public decimal SaldoAtual { get; protected set; }
 
         public ExtratoResposta(){  }
-        public ExtratoResposta(string numeroConta, UltimaMovimentacao ultimaMovimentacao, decimal saldoAnterior, decimal saldoAtual)
+        public ExtratoResposta(ContaId contaId, string numeroConta, UltimaMovimentacao ultimaMovimentacao, decimal saldoAnterior, decimal saldoAtual)
         {
+            Id = new ExtratoId();
+            ContaId = contaId;
             NumeroConta = numeroConta;
             Data = ultimaMovimentacao.DataMovimentacao;
             Operacao = ultimaMovimentacao.TipoOperacao switch
