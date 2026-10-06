@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>d0326e99-5d75-4a12-a268-7b6b4754f56d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjetoBanco.Core\ProjetoBanco.Core.csproj" />
-    </ItemGroup>
+  </ItemGroup>
 
 </Project>

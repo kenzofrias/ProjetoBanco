@@ -31,21 +31,17 @@ namespace ProjetoBanco.Infrastructure.Repositories
             }
 
             _context.Contas.Add(conta);
-            // A responsabilidade de salvar foi movida para a camada de serviço/aplicação.
         }
 
         public async Task AtualizarContaAsync(Conta conta)
         {
-            // Usamos AnyAsync para verificar apenas a existência, sem "rastrear" a entidade e causar conflito
-            var contaExiste = await _context.Contas.AnyAsync(c => c.Numero == conta.Numero);
-
+            var contaExiste = await ContaExisteAsync(conta.Id);
             if (!contaExiste)
             {
-                throw new KeyNotFoundException($"[ERRO] A conta de número {conta.Numero} não foi encontrada para atualização.");
+                throw new KeyNotFoundException($"[ERRO] A conta de número {conta.Id} não foi encontrada para atualização.");
             }
             
             _context.Contas.Update(conta);
-            // A responsabilidade de salvar foi movida para a camada de serviço/aplicação.
         }
 
         public async Task<Conta?> ObterContaPorIdAsync(ContaId contaId)
@@ -76,9 +72,9 @@ namespace ProjetoBanco.Infrastructure.Repositories
             return contasPoupanca;
         }
 
-        public async Task RemoverContaAsync(string numeroConta)
+        public async Task RemoverContaAsync(ContaId contaId)
         {
-            var contaRemover = await ObterContaPorNumeroAsync(numeroConta);
+            var contaRemover = await ObterContaPorIdAsync(contaId);
 
             _context.Contas.Remove(contaRemover);
             // A responsabilidade de salvar foi movida para a camada de serviço/aplicação.
