@@ -14,7 +14,7 @@ namespace ProjetoBanco.Core.Models
     {
         private readonly List<ExtratoResposta> _historico;
 
-        public ContaId Id { get; protected set; } = new();
+        public ContaId Id { get; protected set; } = null!;
         public string NumeroConta { get; protected set; } = string.Empty;
         public string Agencia { get; protected set; } = string.Empty;
         public TipoConta TipoConta { get; protected set; }
@@ -36,6 +36,7 @@ namespace ProjetoBanco.Core.Models
             if (string.IsNullOrWhiteSpace(agencia) || agencia.Length > 5)
                 throw new ArgumentException("[ERRO] Agência inválida. Deve conter no máximo 5 caracteres.", nameof(agencia));
 
+            Id = new ContaId();
             NumeroConta = numero;
             Agencia = agencia;
             Status = Status.Ativa;
@@ -53,6 +54,7 @@ namespace ProjetoBanco.Core.Models
 
             Saldo += valor;
             UltimaMovimentacao = new UltimaMovimentacao(DateTime.UtcNow, tipoOperacao, valor);
+            AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo - valor, Saldo));
         }
 
         protected virtual bool PodeRealizarOperacao(decimal valor) =>
@@ -69,6 +71,7 @@ namespace ProjetoBanco.Core.Models
 
             Saldo -= valor;
             UltimaMovimentacao = new UltimaMovimentacao(DateTime.UtcNow, tipoOperacao, valor);
+            AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo + valor, Saldo));
         }
 
         public void AdicionarMovimentacaoExtrato(ExtratoResposta extratoResposta) =>

@@ -35,6 +35,7 @@ namespace ProjetoBanco.Core.Models
             var valorTarifa = TaxaManutencao;
             Saldo -= valorTarifa;
             UltimaMovimentacao = new UltimaMovimentacao(DateTime.UtcNow, TipoOperacao.TarifaMensal, valorTarifa);
+            AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo + valorTarifa, Saldo));
         }
 
         public override string ToString() =>

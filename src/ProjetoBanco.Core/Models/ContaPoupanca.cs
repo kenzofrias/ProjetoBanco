@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ProjetoBanco.Core.Enums;
 using ProjetoBanco.Core.Exceptions;
 using ProjetoBanco.Core.Interfaces;
+using ProjetoBanco.Core.ValueObjects;
 
 namespace ProjetoBanco.Core.Models
 {
@@ -35,7 +36,8 @@ namespace ProjetoBanco.Core.Models
 
             decimal rendimento = Saldo * TaxaRendimento;
             Saldo += rendimento;
-            // AdicionarMovimentacaoHistorico(new HistoricoResposta(Numero, TipoOperacao.Rendimento, rendimento, Saldo - rendimento, Saldo));
+            UltimaMovimentacao = new UltimaMovimentacao(DateTime.UtcNow, TipoOperacao.Rendimento, rendimento);
+            AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo - rendimento, Saldo));
         }
 
         public override string ToString() =>
