@@ -15,37 +15,45 @@ Console.WriteLine("Migrations aplicadas com sucesso.");
 
 using var dbContext = new BancoDBContext();
 var repositorio = new ContaRepositorio(dbContext);
+var transferenciaService = new TransferenciaService(repositorio);
+var extratoService = new ExtratoService(repositorio);
 
-async Task<Conta> ObterOuCriarContaAsync(Conta novaConta)
+async Task<Conta> ObterOuCriarContaAsync(Conta conta)
 {
-    var contaExistente = await repositorio.ObterContaPorNumeroAsync(novaConta.Numero);
-    if (contaExistente == null)
+    var contaExistente = await repositorio.ObterContaPorNumeroEAgenciaAsync(
+        conta.NumeroConta,
+        conta.Agencia);
+
+    if (contaExistente is not null)
     {
-        await repositorio.AdicionarContaAsync(novaConta);
-        return novaConta;
+        return contaExistente;
     }
-    return contaExistente;
+
+    await repositorio.AdicionarContaAsync(conta);
+    return conta;
 }
 
 Console.WriteLine("\n--- Criando ou Carregando Contas ---");
-Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("12345", "João C O Silva", 1200m, 500m));
-Conta c2 = await ObterOuCriarContaAsync(new ContaCorrente("54321", "Maria S O Silva", 1400m, 750m));
-Conta c3 = await ObterOuCriarContaAsync(new ContaPoupanca("67890", "Carlos A O Silva", 2000m, 5m));
-Conta c4 = await ObterOuCriarContaAsync(new ContaPoupanca("09876", "Ana C O Silva", 1500m, 3m));
-Console.WriteLine("Contas carregadas com sucesso.");
+Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("12345", "0001", 1200m, 500m));
+Conta c2 = await ObterOuCriarContaAsync(new ContaCorrente("54321", "0001", 1400m, 750m));
+Conta c3 = await ObterOuCriarContaAsync(new ContaPoupanca("67890", "0001", 2000m));
+Conta c4 = await ObterOuCriarContaAsync(new ContaPoupanca("09876", "0001", 1500m));
+
+await repositorio.SalvarAlteracoesAsync();
+Console.WriteLine("Contas salvas com sucesso.");
 
 Console.WriteLine("\n--- Realizando Operações ---");
-c1.Depositar(100m);
-c2.Sacar(200m);
-c1.Transferir(c3, 50m);
-c4.Transferir(c1, 100m);
+c1.Creditar(100m);
+c2.Debitar(200m);
+await transferenciaService.Transferir(c1.Id, c3.Id, 50m);
+await transferenciaService.Transferir(c4.Id, c1.Id, 100m);
 
 await repositorio.SalvarAlteracoesAsync();
 Console.WriteLine("Operações salvas no banco de dados.");
 
-c1.ExibirExtrato();
-c2.ExibirExtrato();
-c3.ExibirExtrato();
-c4.ExibirExtrato();
+Console.WriteLine(await extratoService.GerarExtrato(c1.Id));
+Console.WriteLine(await extratoService.GerarExtrato(c2.Id));
+Console.WriteLine(await extratoService.GerarExtrato(c3.Id));
+Console.WriteLine(await extratoService.GerarExtrato(c4.Id));
 
 Console.WriteLine("\n--- Finalizando a Aplicação ---");
