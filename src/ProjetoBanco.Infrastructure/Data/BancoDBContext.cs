@@ -49,7 +49,7 @@ namespace ProjetoBanco.Infrastructure.Data
                 .ValueGeneratedNever();
             modelBuilder.Entity<Conta>().Property(c => c.NumeroConta).HasMaxLength(7).IsRequired();
             modelBuilder.Entity<Conta>().Property(c => c.Agencia).HasMaxLength(5).IsRequired();
-            modelBuilder.Entity<Conta>().Property(c => c.TipoConta).HasConversion<string>().IsRequired();
+            modelBuilder.Entity<Conta>().Ignore(c => c.TipoConta);
             modelBuilder.Entity<Conta>().Property(c => c.Status).HasConversion<string>().IsRequired();
             modelBuilder.Entity<Conta>().Property(c => c.DataAbertura).IsRequired();
             modelBuilder.Entity<Conta>().Ignore(c => c.UltimaMovimentacao);
@@ -84,9 +84,9 @@ namespace ProjetoBanco.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Conta>()
-                .HasDiscriminator<string>("TipoConta")
-                .HasValue<ContaCorrente>("ContaCorrente")
-                .HasValue<ContaPoupanca>("ContaPoupanca");
+                .HasDiscriminator<string>("TipoContaDiscriminator")
+                .HasValue<ContaCorrente>("Conta Corrente")
+                .HasValue<ContaPoupanca>("Conta Poupança");
         }
     }
 }

@@ -18,13 +18,26 @@ namespace ProjetoBanco.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<bool> ContaExisteAsync(ContaId contaId)
+        public async Task<bool> ContaExistePorIdAsync(ContaId contaId)
         {
             return await _context.Contas.AnyAsync(c => c.Id == contaId);
         }
 
+        public async Task<bool> ContaExistePorNumeroEAgenciaAsync(string numeroConta, string agencia)
+        {
+            return await _context.Contas.AnyAsync(c => c.NumeroConta == numeroConta && c.Agencia == agencia);
+        }
+
         public async Task AdicionarContaAsync(Conta conta)
         {
+            if(ContaExistePorNumeroEAgenciaAsync(conta.NumeroConta, conta.Agencia).Result)
+            {
+                throw new InvalidOperationException($"[ERRO] A conta de número {conta.NumeroConta} e agência {conta.Agencia} já existe.");
+            }
+            if(ContaExistePorIdAsync(conta.Id).Result)
+            {
+                throw new InvalidOperationException($"[ERRO] A conta de número {conta.Id} já existe.");
+            }
             if (conta == null)
             {
                 throw new ArgumentNullException(nameof(conta));
@@ -35,7 +48,7 @@ namespace ProjetoBanco.Infrastructure.Repositories
 
         public async Task AtualizarContaAsync(Conta conta)
         {
-            var contaExiste = await ContaExisteAsync(conta.Id);
+            var contaExiste = await ContaExistePorIdAsync(conta.Id);
             if (!contaExiste)
             {
                 throw new KeyNotFoundException($"[ERRO] A conta de número {conta.Id} não foi encontrada para atualização.");
@@ -46,10 +59,18 @@ namespace ProjetoBanco.Infrastructure.Repositories
 
         public async Task<Conta?> ObterContaPorIdAsync(ContaId contaId)
         {
-            // Realiza apenas 1 viagem ao banco de dados.
             var conta = await _context.Contas
                 .Include(c => c.Historico)
                 .FirstOrDefaultAsync(c => c.Id == contaId);
+
+            return conta;
+        }
+
+        public async Task<Conta?> ObterContaPorNumeroEAgenciaAsync(string numeroConta, string agencia)
+        {
+            var conta = await _context.Contas
+                .Include(c => c.Historico)
+                .FirstOrDefaultAsync(c => c.NumeroConta == numeroConta && c.Agencia == agencia);
 
             return conta;
         }
@@ -76,8 +97,12 @@ namespace ProjetoBanco.Infrastructure.Repositories
         {
             var contaRemover = await ObterContaPorIdAsync(contaId);
 
+            if (contaRemover is null)
+            {
+                throw new KeyNotFoundException($"[ERRO] A conta de número {contaId.Valor} não foi encontrada para remoção.");
+            }
+
             _context.Contas.Remove(contaRemover);
-            // A responsabilidade de salvar foi movida para a camada de serviço/aplicação.
         }
 
         public async Task SalvarAlteracoesAsync()
