@@ -9,8 +9,10 @@ namespace ProjetoBanco.Core.Interfaces
 {
     public interface IContaRepositorio
     {
-        Task<bool> ContaExisteAsync(ContaId contaId);
+        Task<bool> ContaExistePorIdAsync(ContaId contaId);
+        Task<bool> ContaExistePorNumeroEAgenciaAsync(string numeroConta, string agencia);
         Task<Conta?> ObterContaPorIdAsync(ContaId contaId);
+        Task<Conta?> ObterContaPorNumeroEAgenciaAsync(string numeroConta, string agencia);
         Task<IEnumerable<Conta?>> ObterTodasContasAsync();
         Task<IEnumerable<Conta?>> ObterTodasContasCorrenteAsync();
         Task<IEnumerable<Conta?>> ObterTodasContasPoupançaAsync();

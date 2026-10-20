@@ -45,7 +45,7 @@ namespace ProjetoBanco.Core.Models
             _historico = new List<ExtratoResposta>();
         }
 
-        public virtual void DepositarEReceber(decimal valor, TipoOperacao tipoOperacao = TipoOperacao.Deposito)
+        public virtual void Creditar(decimal valor, TipoOperacao tipoOperacao = TipoOperacao.Deposito)
         {
             if (Status != Status.Ativa)
                 throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o depósito.");
@@ -60,7 +60,7 @@ namespace ProjetoBanco.Core.Models
         protected virtual bool PodeRealizarOperacao(decimal valor) =>
             Saldo >= valor;
 
-        public virtual void SacarETransferir(decimal valor, TipoOperacao tipoOperacao = TipoOperacao.Saque)
+        public virtual void Debitar(decimal valor, TipoOperacao tipoOperacao = TipoOperacao.Saque)
         {
             if (Status != Status.Ativa)
                 throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o saque.");

@@ -14,6 +14,8 @@ namespace ProjetoBanco.Core.Models
     {
         public decimal TaxaRendimento { get; protected set; }
 
+        public ContaPoupanca() { }
+
         public ContaPoupanca(string numero, string agencia, decimal saldo) : base(numero, agencia, saldo)
         {
             var random = new Random();
@@ -31,7 +33,7 @@ namespace ProjetoBanco.Core.Models
         {
             if (Status != Status.Ativa) 
                 throw new ContaInativaException("[ERRO] Conta inativa. Não é possível aplicar rendimento.");
-            if (!PodeRealizarOperacao(0)) 
+            if (Saldo <= 0)
                 throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.");
 
             decimal rendimento = Saldo * TaxaRendimento;
