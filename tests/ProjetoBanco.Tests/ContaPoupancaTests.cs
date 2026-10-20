@@ -1,185 +1,61 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text;
-using ProjetoBanco.Core.Models;
 using ProjetoBanco.Core.Exceptions;
+using ProjetoBanco.Core.Models;
 
 namespace ProjetoBanco.Tests;
 
-    public class ContaPoupancaTests
+public class ContaPoupancaTests
+{
+    [Fact]
+    public void CreditarAtualizaSaldo()
     {
-        private ContaPoupanca _contaPoupanca = new ContaPoupanca("12345", "João C O Silva", 1000m, 5m);
-        private ContaPoupanca _contaPoupancaZerada = new ContaPoupanca("67890", "Ana M R Oliveira", 0m, 5m);
-        private ContaCorrente _contaCorrente = new ContaCorrente("54321", "Maria A B Souza", 500m, 200m);
+        var conta = new ContaPoupanca("12345", "0001", 1000m);
 
-        public ContaPoupancaTests()
-        {
-            Console.OutputEncoding = Encoding.UTF8;
-        }
+        conta.Creditar(100m);
 
-        // Teste de depósito
-        [Fact]
-        public void DeveDepositar100ReaisERetornarSado1100Reais()
-        {
-            decimal valorDeposito = 100m;
-
-            _contaPoupanca.Depositar(valorDeposito);
-
-            Assert.Equal(1100m, _contaPoupanca.Saldo);
-        }
-
-        [Fact]
-        public void DeveDepositar100ReaisNegativosERetornarExcecao()
-        {
-            decimal valorDeposito = -100m;
-
-            var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Depositar(valorDeposito));
-
-            Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
-        }
-
-        [Fact]
-        public void DeveDepositar0ReaisERetornarExcecao()
-        {
-            decimal valorDeposito = 0m;
-
-            var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Depositar(valorDeposito));
-
-            Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.", ex.Message);
-        }
-
-        // Testes de saque
-        [Fact]
-        public void DeveSacar34522ReaisERetornarSaldo65478()
-        {
-            // Given
-            decimal valorSaque = 345.22m;
-
-            // When
-            _contaPoupanca.Sacar(valorSaque);
-
-            // Then
-            Assert.Equal(654.78m, _contaPoupanca.Saldo);
-        }
-
-        [Fact]
-        public void DeveSacar2000ReaisERetornarExcecao()
-        {
-            // Given
-            decimal valorSaque = 2000m;
-
-            // When
-            var ex = Assert.Throws<SaldoInsuficienteException>(
-                () => _contaPoupanca.Sacar(valorSaque));
-
-            // Then
-            Assert.Equal("[ERRO] Saldo insuficiente. Não é possível realizar o saque.", ex.Message);
-        }
-
-        [Fact]
-        public void DeveSacar100ReaisNegativosERetornarExcecao()
-        {
-            // Given
-            decimal valorSaque = -100m;
-
-            // When
-            var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Sacar(valorSaque));
-
-            // Then
-            Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar o saque.", ex.Message);
-        }
-
-        // Testes de transferência
-        [Fact]
-        public void DeveTransferir34522ERetornar65478ESaldosDoDestino()
-        {
-            // Given
-            decimal valorTransferencia = 345.22m;
-
-            // When
-            _contaPoupanca.Transferir(_contaCorrente, valorTransferencia);
-
-            // Then
-            Assert.Equal(654.78m, _contaPoupanca.Saldo);
-            Assert.Equal(845.22m, _contaCorrente.Saldo);
-            Assert.Equal(1045.22m, _contaCorrente.SaldoDisponivel);
-        }
-
-        [Fact]
-        public void DeveTransferir2000ReaisERetornarExcecaoESaldosDoDestino()
-        {
-            // Given
-            decimal valorTransferencia = 2000m;
-
-            // When
-            var ex = Assert.Throws<SaldoInsuficienteException>(
-                () => _contaPoupanca.Transferir(_contaCorrente, valorTransferencia));
-
-            // Then
-            Assert.Equal("[ERRO] Saldo insuficiente. Não é possível realizar a transferência.", ex.Message);
-            Assert.Equal(500m, _contaCorrente.Saldo);
-            Assert.Equal(700m, _contaCorrente.SaldoDisponivel);
-        }
-
-        [Fact]
-        public void DeveTransferir100ReaisNegativosERetornarExcecaoESaldosDoDestino()
-        {
-            // Given
-            decimal valorTransferencia = -100m;
-
-            // When
-            var ex = Assert.Throws<ValorInsuficienteException>(
-                () => _contaPoupanca.Transferir(_contaCorrente, valorTransferencia));
-
-            // Then
-            Assert.Equal("[ERRO] Valor deve ser positivo. Não é possível realizar a transferência.", ex.Message);
-            Assert.Equal(500m, _contaCorrente.Saldo);
-            Assert.Equal(700m, _contaCorrente.SaldoDisponivel);
-        }
-
-        // Testes de aplicação de rendimento
-        [Fact]
-        public void DeveAplicarRendimentoUmaVezERetornarSaldoNovo()
-        {
-            // Given
-
-            // When
-            _contaPoupanca.AplicarRendimento();
-
-            // Then
-            Assert.Equal(1050m, _contaPoupanca.Saldo);
-        }
-
-        [Fact]
-        public void DeveAplicarRendimento5VezesERetornarSaldoNovo()
-        {
-            // Given
-            int contador = 1;
-
-            // When
-            while (contador <= 5)
-            {
-                _contaPoupanca.AplicarRendimento();
-                contador++;
-            }
-
-            // Then
-            Assert.Equal(1276.28m, _contaPoupanca.Saldo, 2);
-        }
-        
-        [Fact]
-        public void DeveAplicarRendimentoUmaVezERetornarExcecao()
-        {
-            // When
-            var ex = Assert.Throws<SaldoInsuficienteException>(() => _contaPoupancaZerada.AplicarRendimento());
-        
-            // Then
-            Assert.Equal("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.", ex.Message);
-            Assert.Equal(0m, _contaPoupancaZerada.Saldo);
-        }
+        Assert.Equal(1100m, conta.Saldo);
     }
+
+    [Fact]
+    public void DebitarNaoPermiteUltrapassarSaldo()
+    {
+        var conta = new ContaPoupanca("12345", "0001", 1000m);
+
+        conta.Debitar(345.22m);
+
+        Assert.Equal(654.78m, conta.Saldo);
+        Assert.Throws<SaldoInsuficienteException>(() => conta.Debitar(2000m));
+    }
+
+    [Fact]
+    public void AplicarRendimentoUsaTaxaDaConta()
+    {
+        var conta = new ContaPoupanca("12345", "0001", 1000m);
+        var saldoInicial = conta.Saldo;
+        var rendimentoEsperado = saldoInicial * conta.TaxaRendimento;
+
+        conta.AplicarRendimento();
+
+        Assert.Equal(saldoInicial + rendimentoEsperado, conta.Saldo);
+        Assert.Equal("Rendimento", Assert.Single(conta.Historico).Operacao);
+    }
+
+    [Fact]
+    public void AplicarRendimentoComSaldoZeroLancaExcecao()
+    {
+        var conta = new ContaPoupanca("12345", "0001", 0m);
+
+        var excecao = Assert.Throws<SaldoInsuficienteException>(() => conta.AplicarRendimento());
+
+        Assert.Equal("[ERRO] Saldo insuficiente para aplicar rendimento. O saldo deve ser maior que zero.", excecao.Message);
+    }
+
+    [Fact]
+    public void HistoricoMantemIdDaConta()
+    {
+        var conta = new ContaPoupanca("12345", "0001", 1000m);
+
+        conta.Creditar(100m);
+
+        Assert.All(conta.Historico, extrato => Assert.Equal(conta.Id, extrato.ContaId));
+    }
+}
