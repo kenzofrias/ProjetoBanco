@@ -24,49 +24,58 @@ namespace ProjetoBanco.Infrastructure.Migrations
 
             modelBuilder.Entity("ProjetoBanco.Core.Models.Conta", b =>
                 {
-                    b.Property<string>("Numero")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Ativa")
-                        .HasColumnType("bit");
+                    b.Property<string>("Agencia")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<DateTime>("DataAbertura")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NumeroConta")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<decimal>("Saldo")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("TipoConta")
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Titular")
+                    b.Property<string>("TipoContaDiscriminator")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
-                    b.HasKey("Numero");
+                    b.HasKey("Id");
 
                     b.ToTable("Contas");
 
-                    b.HasDiscriminator<string>("TipoConta").HasValue("Conta");
+                    b.HasDiscriminator<string>("TipoContaDiscriminator").HasValue("Conta");
 
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("ProjetoBanco.Core.Models.HistoricoResposta", b =>
+            modelBuilder.Entity("ProjetoBanco.Core.Models.ExtratoResposta", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("ContaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Data")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NumeroConta")
                         .IsRequired()
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<string>("Operacao")
                         .IsRequired()
@@ -83,7 +92,7 @@ namespace ProjetoBanco.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NumeroConta");
+                    b.HasIndex("ContaId");
 
                     b.ToTable("Historicos");
                 });
@@ -98,7 +107,7 @@ namespace ProjetoBanco.Infrastructure.Migrations
                     b.Property<decimal>("TaxaManutencao")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasDiscriminator().HasValue("ContaCorrente");
+                    b.HasDiscriminator().HasValue("Conta Corrente");
                 });
 
             modelBuilder.Entity("ProjetoBanco.Core.Models.ContaPoupanca", b =>
@@ -108,14 +117,14 @@ namespace ProjetoBanco.Infrastructure.Migrations
                     b.Property<decimal>("TaxaRendimento")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasDiscriminator().HasValue("ContaPoupanca");
+                    b.HasDiscriminator().HasValue("Conta Poupança");
                 });
 
-            modelBuilder.Entity("ProjetoBanco.Core.Models.HistoricoResposta", b =>
+            modelBuilder.Entity("ProjetoBanco.Core.Models.ExtratoResposta", b =>
                 {
                     b.HasOne("ProjetoBanco.Core.Models.Conta", null)
                         .WithMany("Historico")
-                        .HasForeignKey("NumeroConta")
+                        .HasForeignKey("ContaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

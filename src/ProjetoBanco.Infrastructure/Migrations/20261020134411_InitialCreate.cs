@@ -15,27 +15,30 @@ namespace ProjetoBanco.Infrastructure.Migrations
                 name: "Contas",
                 columns: table => new
                 {
-                    Numero = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Titular = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Ativa = table.Column<bool>(type: "bit", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NumeroConta = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: false),
+                    Agencia = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    TipoConta = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Saldo = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TipoConta = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    DataAbertura = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TipoContaDiscriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
                     LimiteChequeEspecial = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     TaxaManutencao = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     TaxaRendimento = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contas", x => x.Numero);
+                    table.PrimaryKey("PK_Contas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Historicos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NumeroConta = table.Column<string>(type: "nvarchar(20)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NumeroConta = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: false),
                     Data = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Operacao = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Valor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -46,17 +49,17 @@ namespace ProjetoBanco.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Historicos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Historicos_Contas_NumeroConta",
-                        column: x => x.NumeroConta,
+                        name: "FK_Historicos_Contas_ContaId",
+                        column: x => x.ContaId,
                         principalTable: "Contas",
-                        principalColumn: "Numero",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Historicos_NumeroConta",
+                name: "IX_Historicos_ContaId",
                 table: "Historicos",
-                column: "NumeroConta");
+                column: "ContaId");
         }
 
         /// <inheritdoc />
