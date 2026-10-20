@@ -16,7 +16,7 @@ public class ExtratoService : IExtratoService
 
     public async Task<ExtratoResposta> AdicionarMovimentacao(ContaId contaId, ExtratoResposta extratoResposta)
     {
-        bool contaExiste = await _contaRepositorio.ContaExisteAsync(contaId);
+        bool contaExiste = await _contaRepositorio.ContaExistePorIdAsync(contaId);
         if (!contaExiste)
         {
             throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");
@@ -30,7 +30,7 @@ public class ExtratoService : IExtratoService
 
     public async Task<string> GerarExtrato(ContaId contaId)
     {
-        bool contaExiste = await _contaRepositorio.ContaExisteAsync(contaId);
+        bool contaExiste = await _contaRepositorio.ContaExistePorIdAsync(contaId);
         if (!contaExiste)
         {
             throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");
@@ -64,7 +64,7 @@ public class ExtratoService : IExtratoService
     
     public async Task<string> ExibirExtrato(ContaId contaId)
     {
-        bool contaExiste = await _contaRepositorio.ContaExisteAsync(contaId);
+        bool contaExiste = await _contaRepositorio.ContaExistePorIdAsync(contaId);
         if (!contaExiste)
         {
             throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");

@@ -35,7 +35,7 @@ public class TransferenciaService : ITransferenciaService
         if (origem == null)
             throw new Exception("[ERRO] A conta de origem não foi encontrada.");
 
-        origem.SacarETransferir(valor, TipoOperacao.TransferenciaEnviada);
+        origem.Debitar(valor, TipoOperacao.TransferenciaEnviada);
     }
     
     public async Task ReceberTransferencia(Conta contaDestino, decimal valor)
@@ -43,6 +43,6 @@ public class TransferenciaService : ITransferenciaService
         if (contaDestino == null)
             throw new Exception("[ERRO] A conta de destino não foi encontrada.");
 
-        contaDestino.DepositarEReceber(valor, TipoOperacao.TransferenciaRecebida);
+        contaDestino.Creditar(valor, TipoOperacao.TransferenciaRecebida);
     }
 }
