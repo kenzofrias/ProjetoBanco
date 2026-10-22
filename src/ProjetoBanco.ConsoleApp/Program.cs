@@ -1,5 +1,6 @@
 ﻿﻿using Microsoft.EntityFrameworkCore;
 using ProjetoBanco.Core.Models;
+using ProjetoBanco.Core.Services;
 using ProjetoBanco.Infrastructure.Data;
 using ProjetoBanco.Infrastructure.Repositories;
 
@@ -36,8 +37,8 @@ async Task<Conta> ObterOuCriarContaAsync(Conta conta)
 Console.WriteLine("\n--- Criando ou Carregando Contas ---");
 Conta c1 = await ObterOuCriarContaAsync(new ContaCorrente("12345", "0001", 1200m, 500m));
 Conta c2 = await ObterOuCriarContaAsync(new ContaCorrente("54321", "0001", 1400m, 750m));
-Conta c3 = await ObterOuCriarContaAsync(new ContaPoupanca("67890", "0001", 2000m));
-Conta c4 = await ObterOuCriarContaAsync(new ContaPoupanca("09876", "0001", 1500m));
+Conta c3 = await ObterOuCriarContaAsync(new ContaPoupanca("67890", "0001", 2000m, 0.05m));
+Conta c4 = await ObterOuCriarContaAsync(new ContaPoupanca("09876", "0001", 1500m, 0.03m));
 
 await repositorio.SalvarAlteracoesAsync();
 Console.WriteLine("Contas salvas com sucesso.");
@@ -47,8 +48,6 @@ c1.Creditar(100m);
 c2.Debitar(200m);
 await transferenciaService.Transferir(c1.Id, c3.Id, 50m);
 await transferenciaService.Transferir(c4.Id, c1.Id, 100m);
-
-await repositorio.SalvarAlteracoesAsync();
 Console.WriteLine("Operações salvas no banco de dados.");
 
 Console.WriteLine(await extratoService.GerarExtrato(c1.Id));
