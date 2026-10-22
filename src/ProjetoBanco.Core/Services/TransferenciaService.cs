@@ -1,9 +1,11 @@
 using System;
 using ProjetoBanco.Core.Enums;
+using ProjetoBanco.Core.Exceptions;
 using ProjetoBanco.Core.Interfaces;
+using ProjetoBanco.Core.Models;
 using ProjetoBanco.Core.ValueObjects;
 
-namespace ProjetoBanco.Core.Models;
+namespace ProjetoBanco.Core.Services;
 
 public class TransferenciaService : ITransferenciaService
 {
@@ -21,28 +23,14 @@ public class TransferenciaService : ITransferenciaService
         if (contaOrigem == null || contaDestino == null)
             throw new Exception("[ERRO] Uma das contas não foi encontrada.");
 
-        await RealizarTransferencia(contaOrigem, valor);
-        await ReceberTransferencia(contaDestino, valor);
+        if (contaDestino.Status != Status.Ativa)
+            throw new ContaInativaException("[ERRO] Conta inativa. Não é possível receber a transferência.");
+
+        contaOrigem.Debitar(valor, TipoOperacao.TransferenciaEnviada);
+        contaDestino.Creditar(valor, TipoOperacao.TransferenciaRecebida);
 
         await _contaRepositorio.AtualizarContaAsync(contaOrigem);
         await _contaRepositorio.AtualizarContaAsync(contaDestino);
-    }
-
-    public async Task RealizarTransferencia(Conta contaOrigem, decimal valor)
-    {
-        var origem = contaOrigem;
-        
-        if (origem == null)
-            throw new Exception("[ERRO] A conta de origem não foi encontrada.");
-
-        origem.Debitar(valor, TipoOperacao.TransferenciaEnviada);
-    }
-    
-    public async Task ReceberTransferencia(Conta contaDestino, decimal valor)
-    {
-        if (contaDestino == null)
-            throw new Exception("[ERRO] A conta de destino não foi encontrada.");
-
-        contaDestino.Creditar(valor, TipoOperacao.TransferenciaRecebida);
+        await _contaRepositorio.SalvarAlteracoesAsync();
     }
 }
