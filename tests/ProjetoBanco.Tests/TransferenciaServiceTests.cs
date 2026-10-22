@@ -1,6 +1,8 @@
 using ProjetoBanco.Core.Exceptions;
+using ProjetoBanco.Core.Enums;
 using ProjetoBanco.Core.Interfaces;
 using ProjetoBanco.Core.Models;
+using ProjetoBanco.Core.Services;
 using ProjetoBanco.Core.ValueObjects;
 
 namespace ProjetoBanco.Tests;
@@ -77,6 +79,35 @@ public class TransferenciaServiceTests
         Assert.Empty(origem.Historico);
     }
 
+    [Fact]
+    public async Task TransferirParaContaInativaNaoDebitaOrigem()
+    {
+        var origem = new ContaCorrente("12345", "0001", 1000m, 200m);
+        var destino = new ContaPoupancaTestavel("67890", "0001", 500m);
+        destino.Bloquear();
+        var repositorio = new RepositorioEmMemoria(origem, destino);
+        var service = new TransferenciaService(repositorio);
+
+        await Assert.ThrowsAsync<ContaInativaException>(
+            () => service.Transferir(origem.Id, destino.Id, 250m));
+
+        Assert.Equal(1000m, origem.Saldo);
+        Assert.Equal(500m, destino.Saldo);
+        Assert.Empty(origem.Historico);
+        Assert.Empty(destino.Historico);
+        Assert.Equal(0, repositorio.QuantidadeDeAtualizacoes);
+    }
+
+    private sealed class ContaPoupancaTestavel : ContaPoupanca
+    {
+        public ContaPoupancaTestavel(string numero, string agencia, decimal saldo)
+            : base(numero, agencia, saldo)
+        {
+        }
+
+        public void Bloquear() => Status = Status.Bloqueada;
+    }
+
     private sealed class RepositorioEmMemoria : IContaRepositorio
     {
         private readonly Dictionary<Guid, Conta> _contas;
@@ -129,5 +160,7 @@ public class TransferenciaServiceTests
             _contas.Remove(contaId.Valor);
             return Task.CompletedTask;
         }
+
+        public Task SalvarAlteracoesAsync() => Task.CompletedTask;
     }
 }

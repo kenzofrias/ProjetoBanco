@@ -25,6 +25,22 @@ public class ExcecoesTests
     }
 
     [Fact]
+    public void CriarContaComSaldoInicialNegativoLancaArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new ContaCorrente("12345", "0001", -1m, 50m));
+    }
+
+    [Fact]
+    public void CriarContaPoupancaDefineTipoEUsaTaxaDeterministica()
+    {
+        var conta = new ContaPoupanca("12345", "0001", 100m, 0.05m);
+
+        Assert.Equal(TipoConta.Poupanca, conta.TipoConta);
+        Assert.Equal(0.05m, conta.TaxaRendimento);
+    }
+
+    [Fact]
     public void CreditarContaInativaLancaContaInativaException()
     {
         var conta = new ContaCorrenteTestavel("12345", "0001", 100m, 50m);
