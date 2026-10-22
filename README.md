@@ -1,341 +1,214 @@
-# 🏦 Sistema de Banco - C# .NET
+# Sistema Bancário
 
-Um sistema bancário completo e robusto desenvolvido em C# utilizando os princípios da Programação Orientada a Objetos (POO). O projeto simula operações bancárias do mundo real, incluindo gestão de contas corrente e poupança, limites de cheque especial, rendimentos, tarifas, transferências e testes unitários automatizados.
+Projeto de estudos em C# e .NET que simula contas correntes e poupanças, operações de crédito e débito, transferências, tarifas, rendimentos e histórico de movimentações.
 
-## 🛠️ Tecnologias Utilizadas
+O objetivo é praticar orientação a objetos, regras de domínio, Entity Framework Core, persistência relacional, testes automatizados e organização de uma solução .NET.
 
-* **C#** (Linguagem de programação principal)
-* **.NET SDK** (Plataforma e ecossistema de desenvolvimento)
-* **Entity Framework Core** (ORM utilizado para persistência em banco de dados)
-* **Docker** (Containerização do ambiente de banco de dados com SQL Server)
-* **SQL Server** (Banco de dados relacional para armazenamento das contas e históricos)
-* **xUnit** (Framework utilizado para a criação dos testes unitários)
+## Tecnologias
 
-## 🗂️ Estrutura do Projeto
+- C# com .NET 10
+- Entity Framework Core 10
+- SQL Server em Docker
+- xUnit
 
-A solução é dividida em três projetos principais, seguindo boas práticas de modularização e separação de responsabilidades:
+## Estrutura
 
-```
+```text
 ProjetoBanco/
-│
-├── 📂 ProjetoBanco.Core/
-|    └── 📂 Enums/
-|    |    └── 📄 TipoOperacao.cs 
-|    ├── 📂 Interfaces/
-|    |    ├── 📄 IConta.cs
-|    |    └── 📄 IHistoricoResposta.cs
-│    ├── 📂 Models/
-|    |    ├── 📄 Conta.cs
-│    |    ├── 📄 ContaCorrente.cs
-│    |    ├── 📄 ContaPoupanca.cs
-|    |    └── 📄 HistoricoResposta.cs
-│    └── 📂 Exceptions/
-|         ├── 📄 SaldoInsuficienteException.cs
-|         ├── 📄 ValorInsuficienteException.cs
-|         ├── 📄 HistoricoRespostaException.cs
-|         └── 📄 ContaInativaException.cs
-│
-├── 📂 ProjetoBanco.Infrastructure/
-|    ├── 📂 Data/
-|    |    └── 📄 BancoDBContext.cs
-|    └── 📂 Repositories/
-|         └── 📄 ContaRepositorio.cs
-│
-├── 📂 ProjetoBanco.ConsoleApp/
-│    └── 📄 Program.cs
-│
-└── 📂 ProjetoBanco.Tests/
-     ├── 📄 ContaCorrenteTests.cs
-     └── 📄 ContaPoupancaTests.cs
+├── src/
+│   ├── ProjetoBanco.Core/
+│   │   ├── Enums/
+│   │   ├── Exceptions/
+│   │   ├── Interfaces/
+│   │   ├── Models/
+│   │   ├── Services/
+│   │   └── ValueObjects/
+│   ├── ProjetoBanco.Infrastructure/
+│   │   ├── Data/
+│   │   ├── Migrations/
+│   │   └── Repositories/
+│   └── ProjetoBanco.ConsoleApp/
+└── tests/
+    └── ProjetoBanco.Tests/
 ```
 
-* **`ProjetoBanco.Core/`**: A biblioteca de classes (Class Library) principal contendo as regras e o domínio do negócio.
-  * `Enums/`: Contém as enumerações utilizadas pelo sistema (`TipoOperacao`) para classificar as movimentações.
-  * `Models/`: Contém as entidades centrais do sistema (`Conta`, `ContaCorrente`, `ContaPoupanca`).
-  * `Exceptions/`: Contém as exceções personalizadas para o controle de domínio (`SaldoInsuficienteException`, `ValorInsuficienteException`, `ContaInativaException`, `HistoricoRespostaException`).
-  * `Interfaces/`: Contém os contratos do sistema, como `IConta` e `IHistoricoResposta`.
-* **`ProjetoBanco.Infrastructure/`**: Camada responsável pela persistência de dados, isolando o ORM do domínio.
-  * `Data/`: Configuração principal do **Entity Framework Core** através do `BancoDBContext`, que gerencia as tabelas e heranças no banco de dados.
-  * `Repositories/`: Implementações baseadas no Repository Pattern (como o `ContaRepositorio`) para centralizar as operações de CRUD.
-* **`ProjetoBanco.ConsoleApp/`**: Uma aplicação de console (Console App) com o `Program.cs`. Ela serve como demonstração prática do uso do sistema, instanciando objetos, injetando dados simulados e realizando operações em tempo real para exibir extratos no console.
-* **`ProjetoBanco.Tests/`**: Projeto de testes unitários utilizando o framework **xUnit**, que garante a integridade de todas as regras de negócio de depósitos, saques e exceções.
+### Core
 
+Contém as regras do domínio. `Conta` é a entidade base, especializada por `ContaCorrente` e `ContaPoupanca`. As entidades controlam saldo, status, operações permitidas e histórico.
 
-## 🗄️ Persistência de Dados e ORM
+`ContaId`, `ExtratoId` e `UltimaMovimentacao` são value objects usados para representar identificadores e dados de movimentação. Os serviços do Core orquestram operações que envolvem mais de uma entidade, como transferências e geração de extratos.
 
-A infraestrutura utiliza o **Entity Framework Core (EF Core)** interligado ao **SQL Server**, garantindo a persistência do estado do sistema através de boas práticas:
-* **Table-Per-Hierarchy (TPH):** O Contexto de Banco de Dados está configurado para salvar as entidades em TPH. Ambas as classes `ContaCorrente` e `ContaPoupanca` habitam a mesma tabela, separadas por uma coluna discriminadora chamada `TipoConta`.
-* **Repository Pattern:** Consultas e manipulações no banco são centralizadas via `ContaRepositorio`, utilizando chamadas totalmente assíncronas (`async/await`) em benefício da performance e da organização do código.
-* **Mapeamento em Cascata:** A relação de `Conta` possuindo muitos `HistoricoResposta` (1:N) foi definida explicitamente através da `Fluent API` para deleção em cascata e configuração restrita dos atributos no banco (ex: `HasColumnType("decimal(18,2)")`).
+### Infrastructure
 
-##  Diagrama de Classes (UML)
+Contém o `BancoDBContext`, as configurações Fluent API do EF Core, as migrações e o repositório de contas. As contas usam herança TPH e os extratos possuem relacionamento com a conta por `ContaId`.
 
-Abaixo está o diagrama UML que representa a estrutura principal do domínio do projeto:
+O banco possui uma restrição única para a combinação de número da conta e agência. A validação existe tanto no repositório quanto no banco, porque a regra não deve depender apenas de uma verificação feita pela aplicação.
 
-```mermaid
-classDiagram
-    class IConta { <<interface>> }
+### ConsoleApp
 
-    class Conta {
-        <<abstract>>
-        +string Numero
-        +string Titular
-        #decimal Saldo
-        +bool Ativa
-        +IReadOnlyCollection~HistoricoResposta~ Historico
-        +Depositar(decimal valor)
-        +Sacar(decimal valor)
-        +Transferir(Conta destino, decimal valor)
-        #ReceberTransferencia(decimal valor)
-        #PodeRealizarOperacao(decimal valor) bool
-        +ExibirExtrato()
-        +ToString() string
-        +AplicarRendimento()
-        +CalcularTarifaMensal()
-    }
+É uma aplicação de demonstração. Ela aplica as migrações, carrega ou cria contas, executa operações e imprime os extratos.
 
-    class ContaCorrente {
-        -decimal _limiteChequeEspecial
-        -decimal _taxaManutencao
-        +decimal SaldoDisponivel
-        #PodeRealizarOperacao(decimal valor) bool
-        +CalcularTarifaMensal()
-        +ToString() string
-    }
+### Tests
 
-    class ContaPoupanca {
-        -decimal _taxaRendimento
-        +AplicarRendimento()
-        +ToString() string
-    }
+Contém testes das regras de depósito, saque, rendimento, tarifas, transferências, validações e exceções. Os testes não dependem do SQL Server: os fluxos de domínio usam um repositório em memória.
 
-    class IHistoricoResposta { <<interface>> }
+## Regras principais
 
-    class HistoricoResposta {
-        +DateTime Data
-        +string Operacao
-        +decimal Valor
-        +decimal SaldoAnterior
-        +decimal SaldoAtual
-    }
+- Contas precisam ter número e agência válidos.
+- O saldo inicial não pode ser negativo.
+- Depósitos e débitos exigem valor positivo.
+- Contas bloqueadas ou encerradas não podem realizar operações.
+- Conta corrente pode utilizar o limite do cheque especial.
+- Conta poupança não pode debitar além do saldo disponível.
+- A taxa de rendimento da poupança é recebida explicitamente como fração decimal. Por exemplo, `0.05m` representa 5%.
+- Uma transferência só é persistida depois que débito e crédito são concluídos.
 
-    class Exception {
-        <<System>>
-    }
+## Fluxo da aplicação
 
-    class SaldoInsuficienteException
-    class ValorInsuficienteException
-    class ContaInativaException
+Ao executar o `ConsoleApp`, o sistema:
 
-    IConta <|.. Conta
-    Conta <|-- ContaCorrente
-    Conta <|-- ContaPoupanca
+1. Lê a variável de ambiente `CONNECTION_STRING`.
+2. Aplica as migrations pendentes no SQL Server.
+3. Cria ou carrega as contas de demonstração.
+4. Executa depósitos, débitos e transferências.
+5. Persiste as alterações usando o repositório.
+6. Gera e exibe os extratos das contas.
 
-    IHistoricoResposta <|.. HistoricoResposta
-    Conta "1" *-- "N" HistoricoResposta
-    
-    Exception <|-- SaldoInsuficienteException
-    Exception <|-- ValorInsuficienteException
-    Exception <|-- ContaInativaException
+As transferências são orquestradas pelo `TransferenciaService`, que carrega as duas contas, valida o destino, realiza o débito e o crédito e salva as alterações no mesmo contexto do EF Core.
+
+## Exemplos de operações
+
+```csharp
+var conta = new ContaPoupanca(
+  numero: "12345",
+  agencia: "0001",
+  saldo: 1000m,
+  taxaRendimento: 0.05m);
+
+conta.Creditar(200m);
+conta.Debitar(100m);
+conta.AplicarRendimento();
 ```
 
-## 🧩 Classes e Modelos Principais
+As taxas são informadas como frações decimais: `0.05m` representa 5% e `0.03m` representa 3%.
 
-### 1. `Conta` (Classe Base/Abstrata)
-Representa a estrutura fundamental de uma conta bancária. Todas as outras contas herdam desta classe, possuindo um modelo de **Domínio Rico** (as regras de negócio estão na própria entidade, não em Services).
-* **Encapsulamento Seguro:** O `Saldo` possui `protected set`, impedindo modificações externas diretas.
-* **Métodos base:**
-  * `Depositar(decimal valor)` e `Sacar(decimal valor)`: Manipulam os fundos validando regras através de *Early Returns* (Cláusulas de Guarda).
-  * `PodeRealizarOperacao(decimal valor)`: Implementa o padrão **Template Method**. A classe base avalia o saldo real, enquanto classes filhas alteram a regra silenciosamente.
-  * `Transferir(Conta destino, decimal valor)`: Orquestra a redução do saldo de origem e chama internamente o método `ReceberTransferencia` na conta de destino.
-  * `ExibirExtrato()`: Imprime detalhadamente no console todo o histórico e movimentações da conta.
+## Operações e exceções
 
-### 2. `ContaCorrente`
-Herda de `Conta`. Representa uma conta padrão para movimentação e uso diário, com suporte a limite de crédito (cheque especial) e taxas de manutenção.
-* **Atributos específicos:** `LimiteChequeEspecial`, `SaldoDisponivel` e tarifa periódica.
-* **Comportamento específico:**
-  * Sobrescreve apenas a regra `PodeRealizarOperacao(decimal valor)` comparando contra o `SaldoDisponivel` em vez do saldo real, reaproveitando a lógica inteira de saques e transferências da classe base (DRY - Don't Repeat Yourself).
-  * `CalcularTarifaMensal()`: Deduz automaticamente a tarifa de manutenção do saldo da conta (no exemplo, o teste aponta um custo mensal que pode, inclusive, deixar a conta negativada).
+| Operação | Condição de erro | Exceção |
+| --- | --- | --- |
+| Creditar | Conta bloqueada ou encerrada | `ContaInativaException` |
+| Creditar | Valor menor ou igual a zero | `ValorInsuficienteException` |
+| Debitar | Conta bloqueada ou encerrada | `ContaInativaException` |
+| Debitar | Valor menor ou igual a zero | `ValorInsuficienteException` |
+| Debitar | Saldo ou limite insuficiente | `SaldoInsuficienteException` |
+| Transferir | Conta de origem ou destino inexistente | Exceção de conta padrão do sistema |
+| Aplicar rendimento | Saldo menor ou igual a zero | `SaldoInsuficienteException` |
 
-### 3. `ContaPoupanca`
-Herda de `Conta`. Ideal para o acúmulo de patrimônio, oferecendo taxa de juros e rendimento sobre o saldo positivo guardado.
-* **Atributos específicos:** `TaxaRendimento` (em valor percentual).
-* **Comportamento específico:**
-  * Apenas o `Saldo` base é considerado (herança inalterada da validação `PodeRealizarOperacao`).
-  * `AplicarRendimento()`: Calcula o percentual de juros sobre o saldo positivo da conta, validando ativamente possíveis exceções de conta inativa ou saldo zerado.
+## Testes automatizados
 
+Os testes cobrem atualmente:
 
-## 🔄 Fluxo de Transferência (Diagrama de Sequência)
+- depósitos e débitos válidos;
+- uso do cheque especial;
+- saldo insuficiente;
+- contas bloqueadas;
+- aplicação de rendimentos;
+- transferências entre contas;
+- transferência para conta inativa sem debitar a origem;
+- validação de número, agência e saldo inicial;
+- identificadores e histórico de movimentações.
 
-Abaixo está o diagrama de sequência detalhando como ocorre a comunicação e as validações entre os objetos durante uma operação de `transferência`: 
+Os testes de domínio usam um repositório em memória e não dependem do SQL Server ou do Docker.
 
-```mermaid
-sequenceDiagram
-    actor Cliente
-    participant Origem as Conta (Origem)
-    participant Destino as Conta (Destino)
-    
-    Cliente->>Origem: Transferir(destino, valor)
-    activate Origem
-    
-    alt Validação de Sucesso (Ativa, Valor > 0, Saldo/Limite OK)
-        Origem->>Origem: Saldo -= valor
-        Origem->>Destino: ReceberTransferencia(valor)
-        activate Destino
-        Destino->>Destino: Saldo += valor
-        Destino->>Destino: Registra no Histórico (Transferência Recebida)
-        Destino-->>Origem: Retorno (Sucesso)
-        deactivate Destino
-        Origem->>Origem: Registra no Histórico (Transferência Realizada)
-        Origem-->>Cliente: Operação Concluída
-    else Falha de Validação (Conta Inativa, Valor <= 0 ou Sem Saldo)
-        Origem-->>Cliente: Lança Exceção (ex: SaldoInsuficienteException)
-    end
-    
-    deactivate Origem
-```
-
-## 🏧 Fluxo de Saque (Conta Corrente com Cheque Especial)
-
-Este diagrama demonstra a lógica de saque na `ContaCorrente`, que verifica não apenas o saldo real, mas também o limite do cheque especial antes de aprovar a transação.
-
-```mermaid 
-sequenceDiagram
-  actor Cliente
-  participant Conta as ContaCorrente
-  
-  Cliente->>Conta: Sacar(valor)
-  activate Conta
-
-  alt Valor inválido (valor <= 0)
-    Conta-->>Cliente: Lança ValorInsuficienteException
-  else Saldo e Limite Suficientes
-   Conta->>Conta: Avalia PodeRealizarOperacao(valor)
-   Conta->>Conta: Saldo -= valor
-   Conta->>Conta: Registra Saque no Histórico
-   Conta-->>Cliente: Operação Concluída
-  else Saldo e Limite Insuficientes
-   Conta-->>Cliente: Lança SaldoInsuficienteException
-  end
-  
-  deactivate Conta
-```
-
-## 📈 Fluxo de Rendimento (Conta Poupança)
-
-A operação de rendimento na `ContaPoupanca` possui condicionais importantes: a conta precisa estar ativa e possuir saldo estritamente maior que zero.
-
-```mermaid
-sequenceDiagram
-  actor Sistema
-  participant Conta as ContaPoupanca
-  
-  Sistema->>Conta: AplicarRendimento()
-  activate Conta
-  
-  alt Conta Ativa e Saldo > 0
-   Conta->>Conta: Calcula rendimento (Saldo * _taxaRendimento)
-   Conta->>Conta: Adiciona rendimento ao Saldo
-   Conta->>Conta: Registra Rendimento no Histórico
-   Conta-->>Sistema: Rendimento Aplicado com Sucesso
-  else Saldo Zerado ou Negativo (<= 0)
-   Conta-->>Sistema: Lança SaldoInsuficienteException
-  else Conta Inativa
-   Conta-->>Sistema: Lança ContaInativaException
-  end
-
-  deactivate Conta
-```
-
-
-## ⚠️ Tratamento de Exceções
-
-O sistema implementa uma camada de segurança robusta baseada em Exceções customizadas, não permitindo operações inconsistentes:
-* `ValorInsuficienteException`: Disparada imediatamente caso um usuário tente depositar, sacar ou transferir valores negativos (ex: `-100m`) ou zerados (`0m`).
-* `SaldoInsuficienteException`: Disparada quando a conta não possui fundos suficientes para a operação (levando em conta que a poupança usa saldo base, enquanto a corrente considera saldo + limite).
-* `ContaInativaException`: Dispara caso haja problema na instanciação da propriedade `Ativa` (por padrão é `false`).
-* `HistoricoRespostaException`: Disparada caso ocorra uma tentativa de inserir um registro nulo no histórico de movimentações da conta.
-
-
-## 🌟 Boas Práticas Aplicadas
-
-Durante o desenvolvimento deste projeto, foram aplicadas diversas práticas reconhecidas na engenharia de software:
-
-* **Programação Orientada a Objetos (POO):** Uso massivo de Herança (`ContaPoupanca` e `ContaCorrente` derivando de `Conta`), Encapsulamento (controle rígido de estado interno) e Polimorfismo (sobrescrita de métodos de saque e rendimento).
-* **Domínio Rico (Rich Domain):** A lógica de negócio pertence aos modelos. O estado (`Saldo`) tem a alteração blindada (`protected set`) e somente os próprios objetos são responsáveis por se manipular.
-* **Tratamento de Exceções de Domínio:** Adoção de arquitetura resiliente substituindo retornos booleanos tradicionais por exceções de domínio semanticamente ricas (`SaldoInsuficienteException`, `ValorInsuficienteException`, `ContaInativaException`).
-* **Template Method Pattern:** Extração da lógica polimórfica para métodos minúsculos (`PodeRealizarOperacao`), eliminando brutalmente a duplicação de código de validação entre conta corrente e poupança.
-* **Testes Unitários Bem Estruturados:** Construção de testes utilizando as convenções **AAA** (Arrange, Act, Assert) estruturadas via comentários **Given, When, Then**, cobrindo o caminho feliz e casos extremos para proteger a aplicação de regressões.
-* **Clean Code e Early Return:** Código legível em português, sem a pirâmide de *if/else*. Cláusulas de guarda validadas diretamente no início dos métodos aumentam a clareza.
-* **Programação Assíncrona (Async/Await):** Comunicações de I/O na camada de infraestrutura (Entity Framework Core) feitas de forma assíncrona, não travando a execução da Thread primária.
-* **Padrão Repository & Entity Framework:** O uso de DbContext encapsulado dentro de repositórios oculta a complexidade das queries do código de consumo, promovendo flexibilidade.
-
-
-## ✅ Testes Unitários
-
-O projeto foi construído focando em qualidade, contando com extensivos testes automatizados na pasta `ProjetoBanco.Tests`. Estão cobertos cenários como:
-* **Depósitos:** Acúmulo progressivo de saldo, rejeição rigorosa de valores negativos e zeros.
-* **Saques:** Atualização correta do *saldo real* vs *saldo disponível*. Testes validando o bloqueio de saques fora de limites ou saques que usam parte do limite especial.
-* **Transferências:** Débito atômico na origem e crédito correto e sincronizado no destino.
-* **Mecânicas Específicas:** Testes aplicando vários meses (loops) de juros na poupança e observando se o valor bate; testes cobrando mensalidade de clientes de conta corrente zerada e garantindo o uso correto do limite para cobrir a taxa.
-
-
-## 🚀 Como Executar o Projeto
+## Executando localmente
 
 ### Pré-requisitos
-* **.NET SDK** (Recomendado 6.0 ou superior) instalado em sua máquina.
-* **Docker e Docker Compose** instalados e em execução.
 
-### Passo a Passo
+- .NET SDK 10
+- Docker Desktop
 
-1. Clone o repositório ou baixe o código fonte.
-2. Abra o terminal na pasta raiz do projeto.
-3. **Configuração do Ambiente Docker:** O projeto utiliza Docker para gerenciar o SQL Server, garantindo um ambiente de desenvolvimento consistente.
-   * Crie um arquivo chamado `.env` na raiz do projeto com o seguinte conteúdo, definindo uma senha segura para o banco de dados:
-     ```
-     SQL_DOCKER_PASSWORD=SuaSenhaForteAqui!123
-     ```
-   * Inicie o container do SQL Server com o Docker Compose:
-     ```bash
-     docker-compose up -d
-     ```
-4. **Configure a Connection String da Aplicação:** A aplicação C# precisa se conectar ao banco de dados no Docker. Defina a variável de ambiente `CONNECTION_STRING` no seu terminal. **Use a mesma senha definida no arquivo `.env`**.
-   * Em ambiente Windows (CMD):
-     ```bash
-     set CONNECTION_STRING=Server=localhost;Database=BancoDB;User Id=sa;Password=SuaSenhaForteAqui!123;TrustServerCertificate=True;
-     ```
-   * Em ambiente PowerShell:
-     ```powershell
-     $env:CONNECTION_STRING="Server=localhost;Database=BancoDB;User Id=sa;Password=SuaSenhaForteAqui!123;TrustServerCertificate=True;"
-     ```
-5. **Para ver o programa funcionando na prática (Console):**
-   ```bash
-   cd ProjetoBanco.ConsoleApp
-   dotnet run
-   ```
-   *O console exibirá criações de contas, transferências sendo feitas, o impacto do cheque especial e a listagem dos extratos finais.*
+Crie um arquivo `.env` na raiz:
 
-6. **Para rodar a bateria de testes automatizados e validar o código:**
-   ```bash
-   cd ProjetoBanco.Tests
-   dotnet test
-   ```
-   *Você verá a validação das regras de negócio atestadas como "Passed".*
+```env
+SQL_DOCKER_PASSWORD=SuaSenhaForteAqui!123
+```
 
+Inicie o SQL Server:
 
+```powershell
+docker compose up -d
+```
 
-## 📌 Considerações
+Defina a conexão no PowerShell:
 
-Este projeto foi desenvolvido com foco em consolidar conhecimentos em:
-- **Programação Orientada a Objetos (POO):** Abstração, herança e polimorfismo.
-- **Persistência de Dados e ORM:** Configuração avançada de Entity Framework Core via Fluent API.
-- **Modelagem de Domínio:** Tradução de regras de negócio reais para código (limites, tarifas, rendimentos).
-- **Qualidade de Software:** Criação de testes unitários automatizados utilizando o framework xUnit.
-- **Resiliência:** Tratamento robusto de erros criando exceções customizadas da aplicação.
-- **Modularidade:** Separação de responsabilidades entre regras de negócio (Class Library) e interface (Console App).
+```powershell
+$env:CONNECTION_STRING="Server=localhost;Database=BancoDB;User Id=sa;Password=SuaSenhaForteAqui!123;TrustServerCertificate=True;"
+```
 
-## 📝 Licença
-Esse projeto está sob licença. Veja o arquivo [LICENÇA](LICENSE) para mais detalhes.
+Execute a aplicação:
+
+```powershell
+cd src/ProjetoBanco.ConsoleApp
+dotnet run
+```
+
+## Build e testes
+
+Na raiz da solução:
+
+```powershell
+dotnet build Projetos.sln
+dotnet test Projetos.sln
+```
+
+## Migrations do banco
+
+Para listar as migrations:
+
+```powershell
+dotnet ef migrations list `
+  --project src/ProjetoBanco.Infrastructure `
+  --startup-project src/ProjetoBanco.ConsoleApp
+```
+
+Para aplicar as migrations manualmente:
+
+```powershell
+dotnet ef database update `
+  --project src/ProjetoBanco.Infrastructure `
+  --startup-project src/ProjetoBanco.ConsoleApp
+```
+
+O `ConsoleApp` também aplica automaticamente as migrations pendentes ao iniciar.
+
+### Resetar o banco local
+
+Para remover o container e o volume persistente do SQL Server:
+
+```powershell
+docker compose down -v
+docker compose up -d
+```
+
+O parâmetro `-v` apaga os dados locais do banco.
+
+## Observações de arquitetura
+
+O projeto mantém o domínio no Core para que as regras possam ser testadas sem banco de dados. A Infrastructure conhece o EF Core, mas o domínio não depende da implementação do banco. O ConsoleApp é apenas um consumidor dessas abstrações.
+
+A operação de transferência é responsabilidade de `TransferenciaService` porque envolve duas contas e uma persistência conjunta. As operações simples continuam encapsuladas nas entidades, onde o estado do saldo pode ser protegido.
+
+## Limitações atuais
+
+- O projeto não possui uma API web.
+- Não há autenticação ou autorização de usuários.
+- O `ConsoleApp` é uma aplicação de demonstração.
+- Os testes atuais não executam contra um SQL Server real.
+- O sistema depende da variável de ambiente `CONNECTION_STRING` para acessar o banco.
+
+## Licença
+
+Consulte [LICENSE](LICENSE).
 
 ---
 

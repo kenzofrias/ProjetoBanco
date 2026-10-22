@@ -1,0 +1,90 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ProjetoBanco.Core.Enums;
+using ProjetoBanco.Core.Exceptions;
+using ProjetoBanco.Core.Interfaces;
+using ProjetoBanco.Core.ValueObjects;
+
+namespace ProjetoBanco.Core.Models
+{
+    public abstract class Conta : IConta
+    {
+        private readonly List<ExtratoResposta> _historico;
+
+        public ContaId Id { get; protected set; } = null!;
+        public string NumeroConta { get; protected set; } = string.Empty;
+        public string Agencia { get; protected set; } = string.Empty;
+        public abstract TipoConta TipoConta { get; }
+        public Status Status { get; protected set; }
+        public decimal Saldo { get; protected set; }
+        public DateTime DataAbertura { get; protected set; }
+        public UltimaMovimentacao? UltimaMovimentacao { get; protected set; }
+        public IReadOnlyCollection<ExtratoResposta> Historico => _historico.AsReadOnly();
+
+        public Conta()
+        {
+            _historico = new List<ExtratoResposta>();
+        }
+
+        public Conta(string numero, string agencia, decimal saldo)
+        {
+            if (string.IsNullOrWhiteSpace(numero) || numero.Length > 7)
+                throw new ArgumentException("[ERRO] Número da conta inválido. Deve conter no máximo 7 caracteres.", nameof(numero));
+            if (string.IsNullOrWhiteSpace(agencia) || agencia.Length > 5)
+                throw new ArgumentException("[ERRO] Agência inválida. Deve conter no máximo 5 caracteres.", nameof(agencia));
+            if (saldo < 0)
+                throw new ArgumentOutOfRangeException(nameof(saldo), "[ERRO] O saldo inicial não pode ser negativo.");
+
+            Id = new ContaId();
+            NumeroConta = numero;
+            Agencia = agencia;
+            Status = Status.Ativa;
+            Saldo = saldo;
+            DataAbertura = DateTime.UtcNow;
+            _historico = new List<ExtratoResposta>();
+        }
+
+        public virtual void Creditar(decimal valor, TipoOperacao tipoOperacao = TipoOperacao.Deposito)
+        {
+            if (Status != Status.Ativa)
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o depósito.");
+            if (valor <= 0)
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar o depósito.");
+
+            Saldo += valor;
+            UltimaMovimentacao = new UltimaMovimentacao(DateTime.UtcNow, tipoOperacao, valor);
+            AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo - valor, Saldo));
+        }
+
+        protected virtual bool PodeRealizarOperacao(decimal valor) =>
+            Saldo >= valor;
+
+        public virtual void Debitar(decimal valor, TipoOperacao tipoOperacao = TipoOperacao.Saque)
+        {
+            if (Status != Status.Ativa)
+                throw new ContaInativaException("[ERRO] Conta inativa. Não é possível realizar o saque.");
+            if (valor <= 0)
+                throw new ValorInsuficienteException("[ERRO] Valor deve ser positivo. Não é possível realizar o saque.");
+            if (!PodeRealizarOperacao(valor))
+                throw new SaldoInsuficienteException("[ERRO] Saldo insuficiente. Não é possível realizar o saque.");
+
+            Saldo -= valor;
+            UltimaMovimentacao = new UltimaMovimentacao(DateTime.UtcNow, tipoOperacao, valor);
+            AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo + valor, Saldo));
+        }
+
+        internal void AdicionarMovimentacaoExtrato(ExtratoResposta extratoResposta)
+        {
+            ArgumentNullException.ThrowIfNull(extratoResposta);
+            _historico.Add(extratoResposta);
+        }
+
+        public override string ToString() =>
+            $"Numero: {NumeroConta} | Agência: {Agencia} | Saldo: {Saldo:C}";
+        public virtual void CalcularTarifaMensal() { }
+        public virtual void AplicarRendimento() { }
+    }
+}

@@ -1,16 +1,15 @@
-version: '3.8'
-
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver_banco
     environment:
       - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SQL_DOCKER_PASSWORD}
       - SA_PASSWORD=${SQL_DOCKER_PASSWORD}
     ports:
       - "1433:1433"
     volumes:
-      - sqlserver_data:/var/opt/mssql
+      - sqlserver_data:/var/opt/mssql/data
 
 volumes:
   sqlserver_data:
