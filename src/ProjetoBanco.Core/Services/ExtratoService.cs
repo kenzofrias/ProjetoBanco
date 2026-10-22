@@ -1,9 +1,10 @@
 using System;
 using System.Text;
 using ProjetoBanco.Core.Interfaces;
+using ProjetoBanco.Core.Models;
 using ProjetoBanco.Core.ValueObjects;
 
-namespace ProjetoBanco.Core.Models;
+namespace ProjetoBanco.Core.Services;
 
 public class ExtratoService : IExtratoService
 {
@@ -16,27 +17,24 @@ public class ExtratoService : IExtratoService
 
     public async Task<ExtratoResposta> AdicionarMovimentacao(ContaId contaId, ExtratoResposta extratoResposta)
     {
-        bool contaExiste = await _contaRepositorio.ContaExistePorIdAsync(contaId);
-        if (!contaExiste)
+        var conta = await _contaRepositorio.ObterContaPorIdAsync(contaId);
+        if (conta is null)
         {
             throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");
         }
 
-        var conta = await _contaRepositorio.ObterContaPorIdAsync(contaId);
-
+        ArgumentNullException.ThrowIfNull(extratoResposta);
         conta.AdicionarMovimentacaoExtrato(extratoResposta);
         return extratoResposta;
     }
 
     public async Task<string> GerarExtrato(ContaId contaId)
     {
-        bool contaExiste = await _contaRepositorio.ContaExistePorIdAsync(contaId);
-        if (!contaExiste)
+        var conta = await _contaRepositorio.ObterContaPorIdAsync(contaId);
+        if (conta is null)
         {
             throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");
         }
-
-        var conta = await _contaRepositorio.ObterContaPorIdAsync(contaId);
 
         var sb = new StringBuilder();
         string tipoConta = conta.GetType().Name == "ContaPoupanca" ? "Conta Poupança" : "Conta Corrente";
@@ -64,13 +62,6 @@ public class ExtratoService : IExtratoService
     
     public async Task<string> ExibirExtrato(ContaId contaId)
     {
-        bool contaExiste = await _contaRepositorio.ContaExistePorIdAsync(contaId);
-        if (!contaExiste)
-        {
-            throw new KeyNotFoundException($"[ERRO] A conta com ID {contaId} não foi encontrada.");
-        }
-
-        var conta = await _contaRepositorio.ObterContaPorIdAsync(contaId);
         return await GerarExtrato(contaId);
     }
 }
