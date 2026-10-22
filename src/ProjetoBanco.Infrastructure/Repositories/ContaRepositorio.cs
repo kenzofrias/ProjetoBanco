@@ -30,17 +30,15 @@ namespace ProjetoBanco.Infrastructure.Repositories
 
         public async Task AdicionarContaAsync(Conta conta)
         {
-            if(ContaExistePorNumeroEAgenciaAsync(conta.NumeroConta, conta.Agencia).Result)
+            ArgumentNullException.ThrowIfNull(conta);
+
+            if (await ContaExistePorNumeroEAgenciaAsync(conta.NumeroConta, conta.Agencia))
             {
                 throw new InvalidOperationException($"[ERRO] A conta de número {conta.NumeroConta} e agência {conta.Agencia} já existe.");
             }
-            if(ContaExistePorIdAsync(conta.Id).Result)
+            if (await ContaExistePorIdAsync(conta.Id))
             {
                 throw new InvalidOperationException($"[ERRO] A conta de número {conta.Id} já existe.");
-            }
-            if (conta == null)
-            {
-                throw new ArgumentNullException(nameof(conta));
             }
 
             _context.Contas.Add(conta);
@@ -48,6 +46,8 @@ namespace ProjetoBanco.Infrastructure.Repositories
 
         public async Task AtualizarContaAsync(Conta conta)
         {
+            ArgumentNullException.ThrowIfNull(conta);
+
             var contaExiste = await ContaExistePorIdAsync(conta.Id);
             if (!contaExiste)
             {

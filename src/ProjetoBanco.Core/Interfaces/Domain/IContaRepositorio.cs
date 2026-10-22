@@ -19,5 +19,6 @@ namespace ProjetoBanco.Core.Interfaces
         Task AdicionarContaAsync(Conta conta);
         Task AtualizarContaAsync(Conta conta);
         Task RemoverContaAsync(ContaId contaId);
+        Task SalvarAlteracoesAsync();
     }
 }
