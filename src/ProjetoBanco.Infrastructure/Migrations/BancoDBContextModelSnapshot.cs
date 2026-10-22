@@ -54,6 +54,9 @@ namespace ProjetoBanco.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("NumeroConta", "Agencia")
+                        .IsUnique();
+
                     b.ToTable("Contas");
 
                     b.HasDiscriminator<string>("TipoContaDiscriminator").HasValue("Conta");

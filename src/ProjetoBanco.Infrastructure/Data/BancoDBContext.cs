@@ -49,6 +49,9 @@ namespace ProjetoBanco.Infrastructure.Data
                 .ValueGeneratedNever();
             modelBuilder.Entity<Conta>().Property(c => c.NumeroConta).HasMaxLength(7).IsRequired();
             modelBuilder.Entity<Conta>().Property(c => c.Agencia).HasMaxLength(5).IsRequired();
+            modelBuilder.Entity<Conta>()
+                .HasIndex(c => new { c.NumeroConta, c.Agencia })
+                .IsUnique();
             modelBuilder.Entity<Conta>().Ignore(c => c.TipoConta);
             modelBuilder.Entity<Conta>().Property(c => c.Status).HasConversion<string>().IsRequired();
             modelBuilder.Entity<Conta>().Property(c => c.DataAbertura).IsRequired();
