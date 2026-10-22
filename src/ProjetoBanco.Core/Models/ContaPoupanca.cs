@@ -12,18 +12,18 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaPoupanca : Conta
     {
+        public override TipoConta TipoConta => TipoConta.Poupanca;
         public decimal TaxaRendimento { get; protected set; }
 
         public ContaPoupanca() { }
 
-        public ContaPoupanca(string numero, string agencia, decimal saldo) : base(numero, agencia, saldo)
+        public ContaPoupanca(string numero, string agencia, decimal saldo, decimal? taxaRendimento = null) : base(numero, agencia, saldo)
         {
-            var random = new Random();
-            double sorteadoBruto = random.NextDouble();
-            double sorteadoIntevalar = sorteadoBruto * (0.3 - 0.1) + 0.1; // Gera um número aleatório entre 0.1 e 0.3
-            double sorteadoArredondado = Math.Round(sorteadoIntevalar, 2);
+            var taxa = taxaRendimento ?? 0.2m;
+            if (taxa < 0)
+                throw new ArgumentOutOfRangeException(nameof(taxaRendimento), "[ERRO] A taxa de rendimento não pode ser negativa.");
 
-            TaxaRendimento = (decimal)sorteadoArredondado;
+            TaxaRendimento = taxa;
         }
         
         protected override bool PodeRealizarOperacao(decimal valor) => 

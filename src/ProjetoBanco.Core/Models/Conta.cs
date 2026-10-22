@@ -17,7 +17,7 @@ namespace ProjetoBanco.Core.Models
         public ContaId Id { get; protected set; } = null!;
         public string NumeroConta { get; protected set; } = string.Empty;
         public string Agencia { get; protected set; } = string.Empty;
-        public TipoConta TipoConta { get; protected set; }
+        public abstract TipoConta TipoConta { get; }
         public Status Status { get; protected set; }
         public decimal Saldo { get; protected set; }
         public DateTime DataAbertura { get; protected set; }
@@ -35,6 +35,8 @@ namespace ProjetoBanco.Core.Models
                 throw new ArgumentException("[ERRO] Número da conta inválido. Deve conter no máximo 7 caracteres.", nameof(numero));
             if (string.IsNullOrWhiteSpace(agencia) || agencia.Length > 5)
                 throw new ArgumentException("[ERRO] Agência inválida. Deve conter no máximo 5 caracteres.", nameof(agencia));
+            if (saldo < 0)
+                throw new ArgumentOutOfRangeException(nameof(saldo), "[ERRO] O saldo inicial não pode ser negativo.");
 
             Id = new ContaId();
             NumeroConta = numero;
@@ -74,8 +76,11 @@ namespace ProjetoBanco.Core.Models
             AdicionarMovimentacaoExtrato(new ExtratoResposta(Id, NumeroConta, UltimaMovimentacao, Saldo + valor, Saldo));
         }
 
-        public void AdicionarMovimentacaoExtrato(ExtratoResposta extratoResposta) =>
+        internal void AdicionarMovimentacaoExtrato(ExtratoResposta extratoResposta)
+        {
+            ArgumentNullException.ThrowIfNull(extratoResposta);
             _historico.Add(extratoResposta);
+        }
 
         public override string ToString() =>
             $"Numero: {NumeroConta} | Agência: {Agencia} | Saldo: {Saldo:C}";

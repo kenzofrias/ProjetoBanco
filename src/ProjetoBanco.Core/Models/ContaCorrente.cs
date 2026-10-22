@@ -11,6 +11,7 @@ namespace ProjetoBanco.Core.Models
 {
     public class ContaCorrente : Conta
     {
+        public override TipoConta TipoConta => TipoConta.Corrente;
         public decimal LimiteChequeEspecial { get; protected set; }
         public decimal SaldoDisponivel => Saldo + LimiteChequeEspecial;
         public decimal TaxaManutencao { get; protected set; }
@@ -18,6 +19,11 @@ namespace ProjetoBanco.Core.Models
         public ContaCorrente() { }
         public ContaCorrente(string numero, string agencia, decimal saldo, decimal limiteChequeEspecial, decimal taxaManutencao = 20.00m) : base(numero, agencia, saldo)
         {
+            if (limiteChequeEspecial < 0)
+                throw new ArgumentOutOfRangeException(nameof(limiteChequeEspecial), "[ERRO] O limite do cheque especial não pode ser negativo.");
+            if (taxaManutencao < 0)
+                throw new ArgumentOutOfRangeException(nameof(taxaManutencao), "[ERRO] A taxa de manutenção não pode ser negativa.");
+
             LimiteChequeEspecial = limiteChequeEspecial; 
             TaxaManutencao = taxaManutencao;
         }
